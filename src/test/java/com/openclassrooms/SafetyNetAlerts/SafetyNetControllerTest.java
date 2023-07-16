@@ -1,6 +1,6 @@
 package com.openclassrooms.SafetyNetAlerts;
 
-import com.openclassrooms.SafetyNetAlerts.controller.SafetyNetController;
+import com.openclassrooms.SafetyNetAlerts.controller.SafetyController;
 import com.openclassrooms.SafetyNetAlerts.model.dto.Child;
 import com.openclassrooms.SafetyNetAlerts.model.dto.FirestationCoverageResponse;
 import com.openclassrooms.SafetyNetAlerts.model.dto.PersonCaserne;
@@ -22,8 +22,8 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(SafetyNetController.class)
-public class SafetyNetControllerTest {
+@WebMvcTest(SafetyController.class)
+public class SafetyControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
