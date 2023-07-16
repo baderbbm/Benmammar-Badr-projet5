@@ -1,5 +1,7 @@
 package com.openclassrooms.SafetyNetAlerts;
 
+import com.openclassrooms.SafetyNetAlerts.model.Firestation;
+import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
 import com.openclassrooms.SafetyNetAlerts.model.dto.Child;
 import com.openclassrooms.SafetyNetAlerts.model.dto.FirestationCoverageResponse;
@@ -7,11 +9,13 @@ import com.openclassrooms.SafetyNetAlerts.model.dto.PersonCaserne;
 import com.openclassrooms.SafetyNetAlerts.model.dto.Resident;
 import com.openclassrooms.SafetyNetAlerts.model.dto.ResidentInfo;
 import com.openclassrooms.SafetyNetAlerts.model.dto.ResidentStation;
+import com.openclassrooms.SafetyNetAlerts.repository.FirestationRepository;
+import com.openclassrooms.SafetyNetAlerts.repository.MedicalRecordRepository;
+import com.openclassrooms.SafetyNetAlerts.repository.PersonRepository;
 import com.openclassrooms.SafetyNetAlerts.repository.SafetyRepository;
 import com.openclassrooms.SafetyNetAlerts.service.SafetyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,257 +23,260 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 public class SafetyServiceTest {
-	
-    private SafetyService safetyService;
-    private SafetyRepository safetyRepository;
+
+	private SafetyService safetyService;
+
+	private SafetyRepository safetyRepository;
+	private PersonRepository personRepository;
+	private FirestationRepository firestationRepository;
+	private MedicalRecordRepository medicalRecordRepository;
+
+	@BeforeEach
+	public void setUp() {
+		personRepository = new PersonRepository(Arrays.asList(new Person()));
+
+		safetyRepository = new SafetyRepository();
+		firestationRepository = new FirestationRepository(Arrays.asList(new Firestation()));
+		
+		medicalRecordRepository = new MedicalRecordRepository(Arrays.asList(new MedicalRecord()));
 
 
-    @BeforeEach
-    public void setUp() {
-    	safetyRepository = new SafetyRepository(Arrays.asList(new Person()));
-        safetyService = new SafetyService(safetyRepository);
-    }
-    
-   
-    @Test
-    public void testRetrievePersonsByFirestation() {
-        String stationNumber = "4";
-        List<String> expectedAddresses = Arrays.asList("489 Manchester St", "112 Steppes Pl");
-        FirestationCoverageResponse expectedResponse = new FirestationCoverageResponse();
-        List<PersonCaserne> expectedResidents = Arrays.asList(
-                new PersonCaserne("Tony", "Cooper", "112 Steppes Pl", "841-874-6874"),
-                new PersonCaserne("Lily", "Cooper","489 Manchester St", "841-874-9845"),
-                new PersonCaserne("Ron", "Peters", "112 Steppes Pl","841-874-8888"),
-                new PersonCaserne("Allison", "Boyd", "112 Steppes Pl","841-874-9888"));
-        expectedResponse.setPeople(expectedResidents);
-        
-       // when(safetyService.getAddressesByStationNumber(stationNumber)).thenReturn(expectedAddresses);
-      //  when(safetyService.getPeopleByAddresses(expectedAddresses)).thenReturn(expectedResponse);
-        
-      
-        FirestationCoverageResponse actualResponse = safetyService.retrievePersonsByFirestation(stationNumber);
-        
-        //verify(safetyService, times(1)).getAddressesByStationNumber(stationNumber);
-      //  verify(safetyService, times(1)).getPeopleByAddresses(expectedAddresses);
-  
-        assertEquals(expectedResponse.getPeople().get(0).getFirstName(), actualResponse.getPeople().get(0).getFirstName());
-        assertEquals(expectedResponse.getPeople().get(0).getLastName(), actualResponse.getPeople().get(0).getLastName());
-        assertEquals(expectedResponse.getPeople().get(0).getAddress(), actualResponse.getPeople().get(0).getAddress());
-        assertEquals(expectedResponse.getPeople().get(0).getPhone(), actualResponse.getPeople().get(0).getPhone());
-    }
+		safetyService = new SafetyService(safetyRepository, personRepository, firestationRepository,
+				medicalRecordRepository);
+	}
 
-    
-    @Test
-    public void testRetrievePersonsByFirestation_StationNumberEmpty() {
-        FirestationCoverageResponse response = safetyService.retrievePersonsByFirestation("");     
-        assertEquals( new FirestationCoverageResponse().getAdultsCount(), response.getAdultsCount());
-        assertEquals( new FirestationCoverageResponse().getChildrenCount(), response.getChildrenCount());    
-    }
+	@Test
+	public void testRetrievePersonsByFirestation() {
+		String stationNumber = "4";
+		List<String> expectedAddresses = Arrays.asList("489 Manchester St", "112 Steppes Pl");
+		FirestationCoverageResponse expectedResponse = new FirestationCoverageResponse();
+		List<PersonCaserne> expectedResidents = Arrays.asList(
+				new PersonCaserne("Tony", "Cooper", "112 Steppes Pl", "841-874-6874"),
+				new PersonCaserne("Lily", "Cooper", "489 Manchester St", "841-874-9845"),
+				new PersonCaserne("Ron", "Peters", "112 Steppes Pl", "841-874-8888"),
+				new PersonCaserne("Allison", "Boyd", "112 Steppes Pl", "841-874-9888"));
+		expectedResponse.setPeople(expectedResidents);
 
-    
-    @Test
-    public void testRetrieveChildrenByAddress() {
-        List<Child> expectedChildren = Arrays
+		// when(safetyService.getAddressesByStationNumber(stationNumber)).thenReturn(expectedAddresses);
+		// when(safetyService.getPeopleByAddresses(expectedAddresses)).thenReturn(expectedResponse);
+
+		FirestationCoverageResponse actualResponse = safetyService.retrievePersonsByFirestation(stationNumber);
+
+		// verify(safetyService, times(1)).getAddressesByStationNumber(stationNumber);
+		// verify(safetyService, times(1)).getPeopleByAddresses(expectedAddresses);
+
+		assertEquals(expectedResponse.getPeople().get(0).getFirstName(),
+				actualResponse.getPeople().get(0).getFirstName());
+		assertEquals(expectedResponse.getPeople().get(0).getLastName(),
+				actualResponse.getPeople().get(0).getLastName());
+		assertEquals(expectedResponse.getPeople().get(0).getAddress(), actualResponse.getPeople().get(0).getAddress());
+		assertEquals(expectedResponse.getPeople().get(0).getPhone(), actualResponse.getPeople().get(0).getPhone());
+	}
+
+	@Test
+	public void testRetrievePersonsByFirestation_StationNumberEmpty() {
+		FirestationCoverageResponse response = safetyService.retrievePersonsByFirestation("");
+		assertEquals(new FirestationCoverageResponse().getAdultsCount(), response.getAdultsCount());
+		assertEquals(new FirestationCoverageResponse().getChildrenCount(), response.getChildrenCount());
+	}
+
+	@Test
+	public void testRetrieveChildrenByAddress() {
+		List<Child> expectedChildren = Arrays
 				.asList(new Child("Kendrik", "Stelzer", 9, Arrays.asList("Brian Stelzer", "Shawna Stelzer")));
-       // when(safetyService.getChildrenByAddress("947 E. Rose Dr")).thenReturn(expectedChildren);
-        List<Child> actualChildren = safetyService.retrieveChildrenByAddress("947 E. Rose Dr");
-        assertEquals(expectedChildren.get(0).getFirstName(), actualChildren.get(0).getFirstName());
-        assertEquals(expectedChildren.get(0).getLastName(), actualChildren.get(0).getLastName());
-      //  verify(safetyService, times(1)).getChildrenByAddress("947 E. Rose Dr");
-    }
+		// when(safetyService.getChildrenByAddress("947 E. Rose
+		// Dr")).thenReturn(expectedChildren);
+		List<Child> actualChildren = safetyService.retrieveChildrenByAddress("947 E. Rose Dr");
+		assertEquals(expectedChildren.get(0).getFirstName(), actualChildren.get(0).getFirstName());
+		assertEquals(expectedChildren.get(0).getLastName(), actualChildren.get(0).getLastName());
+		// verify(safetyService, times(1)).getChildrenByAddress("947 E. Rose Dr");
+	}
 
-    @Test
-    public void testRetrieveChildrenByAddress_AddressEmpty() {
-        List<Child> children = safetyService.retrieveChildrenByAddress("");
-        assertNotNull(children);
-        assertEquals(0, children.size());
-    }
+	@Test
+	public void testRetrieveChildrenByAddress_AddressEmpty() {
+		List<Child> children = safetyService.retrieveChildrenByAddress("");
+		assertNotNull(children);
+		assertEquals(0, children.size());
+	}
 
-	
-    @Test
-    public void testRetrievePhoneNumbersByFirestation() {
-        List<String> expectedPhoneNumbers = new ArrayList<>();
-        expectedPhoneNumbers.add("841-874-6512");
-        expectedPhoneNumbers.add("841-874-8547");
-        expectedPhoneNumbers.add("841-874-7462");
-        expectedPhoneNumbers.add("841-874-7784");
-        expectedPhoneNumbers.add("841-874-7784");
-        expectedPhoneNumbers.add("841-874-7784");
-        
-      //  when(safetyService.getPhoneNumbersByStationNumber("1")).thenReturn(expectedPhoneNumbers);
+	@Test
+	public void testRetrievePhoneNumbersByFirestation() {
+		List<String> expectedPhoneNumbers = new ArrayList<>();
+		expectedPhoneNumbers.add("841-874-6512");
+		expectedPhoneNumbers.add("841-874-8547");
+		expectedPhoneNumbers.add("841-874-7462");
+		expectedPhoneNumbers.add("841-874-7784");
+		expectedPhoneNumbers.add("841-874-7784");
+		expectedPhoneNumbers.add("841-874-7784");
 
-        List<String> actualPhoneNumbers = safetyService.retrievePhoneNumbersByFirestation("1");
+		// when(safetyService.getPhoneNumbersByStationNumber("1")).thenReturn(expectedPhoneNumbers);
 
-        assertEquals(expectedPhoneNumbers.get(0), actualPhoneNumbers.get(0));
-        assertEquals(expectedPhoneNumbers.get(1), actualPhoneNumbers.get(1));
-        assertEquals(expectedPhoneNumbers.get(2), actualPhoneNumbers.get(2));
-        assertEquals(expectedPhoneNumbers.get(3), actualPhoneNumbers.get(3));
-        assertEquals(expectedPhoneNumbers.get(4), actualPhoneNumbers.get(4));
-        assertEquals(expectedPhoneNumbers.get(5), actualPhoneNumbers.get(5));
-        
-       // verify(safetyService, times(1)).getPhoneNumbersByStationNumber("1");
-    }
-       
-    @Test
-    public void testRetrievePhoneNumbersByFirestation_FirestationNumberEmpty() {
-        List<String> phoneNumbers = safetyService.retrievePhoneNumbersByFirestation("");
-        assertNotNull(phoneNumbers);
-        assertEquals(0, phoneNumbers.size());
-    }
+		List<String> actualPhoneNumbers = safetyService.retrievePhoneNumbersByFirestation("1");
 
-    
-    @Test
-    public void testRetrieveResidentsByAddress() {
-     		String address = "947 E. Rose Dr";
-     		List<String> medications1 = new ArrayList<>(2);
-     		medications1.add("ibupurin:200mg");
-     		medications1.add("hydrapermazol:400mg");
-     		List<String> allergies1 = new ArrayList<>();
-     		allergies1.add("nillacilan");
+		assertEquals(expectedPhoneNumbers.get(0), actualPhoneNumbers.get(0));
+		assertEquals(expectedPhoneNumbers.get(1), actualPhoneNumbers.get(1));
+		assertEquals(expectedPhoneNumbers.get(2), actualPhoneNumbers.get(2));
+		assertEquals(expectedPhoneNumbers.get(3), actualPhoneNumbers.get(3));
+		assertEquals(expectedPhoneNumbers.get(4), actualPhoneNumbers.get(4));
+		assertEquals(expectedPhoneNumbers.get(5), actualPhoneNumbers.get(5));
 
-     		List<String> medications2 = new ArrayList<>();
-     		medications2.add("");
-     		List<String> allergies2 = new ArrayList<>();
-     		allergies2.add("");
+		// verify(safetyService, times(1)).getPhoneNumbersByStationNumber("1");
+	}
 
-     		List<String> medications3 = new ArrayList<>();
-     		medications3.add("noxidian:100mg");
-     		medications3.add("pharmacol:2500mg");
-     		List<String> allergies3 = new ArrayList<>();
-     		allergies3.add("");
+	@Test
+	public void testRetrievePhoneNumbersByFirestation_FirestationNumberEmpty() {
+		List<String> phoneNumbers = safetyService.retrievePhoneNumbersByFirestation("");
+		assertNotNull(phoneNumbers);
+		assertEquals(0, phoneNumbers.size());
+	}
 
-     		List<Resident> expectedResidents = Arrays.asList(
-     				new Resident("Brian", "Stelzer", "841-874-7784", "1", 47, medications1, allergies1),
-     				new Resident("Shawna", "Stelzer", "841-874-7784", "1", 43, medications2, allergies2),
-     				new Resident("Kendrik", "Stelzer", "841-874-7784", "1", 9, medications3, allergies3));
-        
-        
-      //  when(safetyService.getResidentsByAddress("947 E. Rose Dr")).thenReturn(expectedResidents);
+	@Test
+	public void testRetrieveResidentsByAddress() {
+		String address = "947 E. Rose Dr";
+		List<String> medications1 = new ArrayList<>(2);
+		medications1.add("ibupurin:200mg");
+		medications1.add("hydrapermazol:400mg");
+		List<String> allergies1 = new ArrayList<>();
+		allergies1.add("nillacilan");
 
-        List<Resident> actualResidents = safetyService.retrieveResidentsByAddress("947 E. Rose Dr");
+		List<String> medications2 = new ArrayList<>();
+		medications2.add("");
+		List<String> allergies2 = new ArrayList<>();
+		allergies2.add("");
 
-        assertEquals(expectedResidents.get(0).getFirstName(), actualResidents.get(0).getFirstName());
-        assertEquals(expectedResidents.get(0).getLastName(), actualResidents.get(0).getLastName());
-        assertEquals(expectedResidents.get(0).getAge(), actualResidents.get(0).getAge());
-        assertEquals(expectedResidents.get(0).getPhone(), actualResidents.get(0).getPhone());
+		List<String> medications3 = new ArrayList<>();
+		medications3.add("noxidian:100mg");
+		medications3.add("pharmacol:2500mg");
+		List<String> allergies3 = new ArrayList<>();
+		allergies3.add("");
 
+		List<Resident> expectedResidents = Arrays.asList(
+				new Resident("Brian", "Stelzer", "841-874-7784", "1", 47, medications1, allergies1),
+				new Resident("Shawna", "Stelzer", "841-874-7784", "1", 43, medications2, allergies2),
+				new Resident("Kendrik", "Stelzer", "841-874-7784", "1", 9, medications3, allergies3));
 
+		// when(safetyService.getResidentsByAddress("947 E. Rose
+		// Dr")).thenReturn(expectedResidents);
 
-        
-      //  verify(safetyService, times(1)).getResidentsByAddress("947 E. Rose Dr");
-    }
+		List<Resident> actualResidents = safetyService.retrieveResidentsByAddress("947 E. Rose Dr");
 
-    @Test
-    public void testRetrieveResidentsByAddress_AddressEmpty() {
-        List<Resident> residents = safetyService.retrieveResidentsByAddress("");
-        assertNotNull(residents);
-        assertEquals(0, residents.size());
-    }
+		assertEquals(expectedResidents.get(0).getFirstName(), actualResidents.get(0).getFirstName());
+		assertEquals(expectedResidents.get(0).getLastName(), actualResidents.get(0).getLastName());
+		assertEquals(expectedResidents.get(0).getAge(), actualResidents.get(0).getAge());
+		assertEquals(expectedResidents.get(0).getPhone(), actualResidents.get(0).getPhone());
 
-   
-    @Test
-    public void testRetrieveHouseholdsByStations() {
-    	List<ResidentStation> expectedResidents = Arrays.asList(new ResidentStation("Lily", "Cooper", "841-874-9845"),
-    			new ResidentStation("Tony", "Cooper", "841-874-6874"),
-    			new ResidentStation("Ron", "Peters", "841-874-8888"),
-    			new ResidentStation("Allison", "Boyd", "841-874-9888"));
-        
-      //  when(safetyService.getAllResidentsByFirestation("4")).thenReturn(expectedResidents);
+		// verify(safetyService, times(1)).getResidentsByAddress("947 E. Rose Dr");
+	}
 
-        List<ResidentStation> actualResidents = safetyService.retrieveHouseholdsByStations("4");
+	@Test
+	public void testRetrieveResidentsByAddress_AddressEmpty() {
+		List<Resident> residents = safetyService.retrieveResidentsByAddress("");
+		assertNotNull(residents);
+		assertEquals(0, residents.size());
+	}
 
-        assertEquals(expectedResidents.get(0).getFirstName(), actualResidents.get(0).getFirstName());
-        assertEquals(expectedResidents.get(0).getLastName(), actualResidents.get(0).getLastName());
-        assertEquals(expectedResidents.get(0).getPhone(), actualResidents.get(0).getPhone());
-        
-       // verify(safetyService, times(1)).getAllResidentsByFirestation("4");
-    }
-    
-    
-    @Test
-    public void testRetrieveHouseholdsByStations_emptyStationNumbers() {
-        String emptyStationNumbers = "";
-        List<ResidentStation> actualResidents = safetyService.retrieveHouseholdsByStations(emptyStationNumbers);
-        assertEquals(new ArrayList<ResidentStation>(), actualResidents);
-      //  verify(safetyService, times(0)).getAllResidentsByFirestation(emptyStationNumbers);
-    }
+	@Test
+	public void testRetrieveHouseholdsByStations() {
+		List<ResidentStation> expectedResidents = Arrays.asList(new ResidentStation("Lily", "Cooper", "841-874-9845"),
+				new ResidentStation("Tony", "Cooper", "841-874-6874"),
+				new ResidentStation("Ron", "Peters", "841-874-8888"),
+				new ResidentStation("Allison", "Boyd", "841-874-9888"));
 
-    @Test
-    public void testRetrievePersonInfoByName() {
-        List<ResidentInfo> expectedPersons = new ArrayList<>();
-        List<String> medications1 = new ArrayList<>();
+		// when(safetyService.getAllResidentsByFirestation("4")).thenReturn(expectedResidents);
+
+		List<ResidentStation> actualResidents = safetyService.retrieveHouseholdsByStations("4");
+
+		assertEquals(expectedResidents.get(0).getFirstName(), actualResidents.get(0).getFirstName());
+		assertEquals(expectedResidents.get(0).getLastName(), actualResidents.get(0).getLastName());
+		assertEquals(expectedResidents.get(0).getPhone(), actualResidents.get(0).getPhone());
+
+		// verify(safetyService, times(1)).getAllResidentsByFirestation("4");
+	}
+
+	@Test
+	public void testRetrieveHouseholdsByStations_emptyStationNumbers() {
+		String emptyStationNumbers = "";
+		List<ResidentStation> actualResidents = safetyService.retrieveHouseholdsByStations(emptyStationNumbers);
+		assertEquals(new ArrayList<ResidentStation>(), actualResidents);
+		// verify(safetyService,
+		// times(0)).getAllResidentsByFirestation(emptyStationNumbers);
+	}
+
+	@Test
+	public void testRetrievePersonInfoByName() {
+		List<ResidentInfo> expectedPersons = new ArrayList<>();
+		List<String> medications1 = new ArrayList<>();
 		medications1.add("aznol:350mg");
 		medications1.add("hydrapermazol:100mg");
 		List<String> allergies1 = new ArrayList<>();
 		allergies1.add("nillacilan");
-        expectedPersons.add(new ResidentInfo("John", "Boyd", "1509 Culver St", "jaboyd@email.com", 39, medications1, allergies1));
-      //  when(safetyService.getPersonInfo("John", "Boyd")).thenReturn(expectedPersons);
+		expectedPersons.add(
+				new ResidentInfo("John", "Boyd", "1509 Culver St", "jaboyd@email.com", 39, medications1, allergies1));
+		// when(safetyService.getPersonInfo("John",
+		// "Boyd")).thenReturn(expectedPersons);
 
-        List<ResidentInfo> actualPersons = safetyService.retrievePersonInfoByName("John", "Boyd");
+		List<ResidentInfo> actualPersons = safetyService.retrievePersonInfoByName("John", "Boyd");
 
-        assertEquals(expectedPersons.get(0).getFirstName(), actualPersons.get(0).getFirstName());
-        assertEquals(expectedPersons.get(0).getLastName(), actualPersons.get(0).getLastName());
-        assertEquals(expectedPersons.get(0).getAdress(), actualPersons.get(0).getAdress());
-        assertEquals(expectedPersons.get(0).getEmail(), actualPersons.get(0).getEmail());
-        assertEquals(expectedPersons.get(0).getAge(), actualPersons.get(0).getAge());
-        assertEquals(expectedPersons.get(0).getMedications().get(0), actualPersons.get(0).getMedications().get(0));
+		assertEquals(expectedPersons.get(0).getFirstName(), actualPersons.get(0).getFirstName());
+		assertEquals(expectedPersons.get(0).getLastName(), actualPersons.get(0).getLastName());
+		assertEquals(expectedPersons.get(0).getAdress(), actualPersons.get(0).getAdress());
+		assertEquals(expectedPersons.get(0).getEmail(), actualPersons.get(0).getEmail());
+		assertEquals(expectedPersons.get(0).getAge(), actualPersons.get(0).getAge());
+		assertEquals(expectedPersons.get(0).getMedications().get(0), actualPersons.get(0).getMedications().get(0));
 		assertEquals(expectedPersons.get(0).getMedications().get(1), actualPersons.get(0).getMedications().get(1));
 		assertEquals(expectedPersons.get(0).getAllergies().get(0), actualPersons.get(0).getAllergies().get(0));
 
-      //  verify(safetyService, times(1)).getPersonInfo("John", "Boyd");
-    }
-    
-    @Test
-    public void testRetrievePersonInfoByName_emptyName() throws Exception {
-        String emptyFirstName = "";
-        String emptyLastName = "";
-        List<ResidentInfo> actualPersons = safetyService.retrievePersonInfoByName(emptyFirstName, emptyLastName);
-        assertEquals(new ArrayList<ResidentInfo>(), actualPersons);
-     //   verify(safetyService, times(0)).getPersonInfo(emptyFirstName, emptyLastName);
-    }
-    
+		// verify(safetyService, times(1)).getPersonInfo("John", "Boyd");
+	}
 
-    @Test
-    public void testRetrieveCommunityEmailsByCity() {
-        List<String> expectedEmails = new ArrayList<>();
-        expectedEmails.add("jaboyd@email.com");
-        expectedEmails.add("drk@email.com");
-        expectedEmails.add("tenz@email.com");
-        expectedEmails.add("tcoop@ymail.com");
-        expectedEmails.add("lily@email.com");
-        expectedEmails.add("soph@email.com");
-        expectedEmails.add("ward@email.com");
-        expectedEmails.add("zarc@email.com");
-        expectedEmails.add("reg@email.com");
-        expectedEmails.add("jpeter@email.com");
-        expectedEmails.add("aly@imail.com");
-        expectedEmails.add("bstel@email.com");
-        expectedEmails.add("ssanw@email.com");
-        expectedEmails.add("clivfd@ymail.com");
-        expectedEmails.add("gramps@email.com");
-       // when(safetyService.getCommunityEmailsByCity("Culver")).thenReturn(expectedEmails);
+	@Test
+	public void testRetrievePersonInfoByName_emptyName() throws Exception {
+		String emptyFirstName = "";
+		String emptyLastName = "";
+		List<ResidentInfo> actualPersons = safetyService.retrievePersonInfoByName(emptyFirstName, emptyLastName);
+		assertEquals(new ArrayList<ResidentInfo>(), actualPersons);
+		// verify(safetyService, times(0)).getPersonInfo(emptyFirstName, emptyLastName);
+	}
 
-        List<String> actualEmails = safetyService.retrieveCommunityEmailsByCity("Culver");
+	@Test
+	public void testRetrieveCommunityEmailsByCity() {
+		List<String> expectedEmails = new ArrayList<>();
+		expectedEmails.add("jaboyd@email.com");
+		expectedEmails.add("drk@email.com");
+		expectedEmails.add("tenz@email.com");
+		expectedEmails.add("tcoop@ymail.com");
+		expectedEmails.add("lily@email.com");
+		expectedEmails.add("soph@email.com");
+		expectedEmails.add("ward@email.com");
+		expectedEmails.add("zarc@email.com");
+		expectedEmails.add("reg@email.com");
+		expectedEmails.add("jpeter@email.com");
+		expectedEmails.add("aly@imail.com");
+		expectedEmails.add("bstel@email.com");
+		expectedEmails.add("ssanw@email.com");
+		expectedEmails.add("clivfd@ymail.com");
+		expectedEmails.add("gramps@email.com");
+		// when(safetyService.getCommunityEmailsByCity("Culver")).thenReturn(expectedEmails);
 
-        assertEquals(expectedEmails.get(0), actualEmails.get(0));
-        assertEquals(expectedEmails.get(1), actualEmails.get(1));
-        assertEquals(expectedEmails.get(2), actualEmails.get(2));
-    
-       // verify(safetyService, times(1)).getCommunityEmailsByCity("Culver");
-    }
-     
-    @Test
-    public void testRetrieveCommunityEmailsByCity_emptyCity() throws Exception {
-        String emptyCity = "";
-        List<String> actualEmails = safetyService.retrieveCommunityEmailsByCity(emptyCity);
-        assertEquals(new ArrayList<String>(), actualEmails);
-       // verify(safetyService, times(0)).getCommunityEmailsByCity(emptyCity);
-    }
-    
-   
-    @Test
+		List<String> actualEmails = safetyService.retrieveCommunityEmailsByCity("Culver");
+
+		assertEquals(expectedEmails.get(0), actualEmails.get(0));
+		assertEquals(expectedEmails.get(1), actualEmails.get(1));
+		assertEquals(expectedEmails.get(2), actualEmails.get(2));
+
+		// verify(safetyService, times(1)).getCommunityEmailsByCity("Culver");
+	}
+
+	@Test
+	public void testRetrieveCommunityEmailsByCity_emptyCity() throws Exception {
+		String emptyCity = "";
+		List<String> actualEmails = safetyService.retrieveCommunityEmailsByCity(emptyCity);
+		assertEquals(new ArrayList<String>(), actualEmails);
+		// verify(safetyService, times(0)).getCommunityEmailsByCity(emptyCity);
+	}
+
+	@Test
 	public void testgetAddressesByStationNumber() {
 		// Données de test
 		String stationNumber = "4";
@@ -432,10 +439,10 @@ public class SafetyServiceTest {
 		allergies1.add("nillacilan");
 
 		// Résultat attendu
-		
-		List<ResidentInfo> expected = Arrays
-		.asList(new ResidentInfo("John", "Boyd", "1509 Culver St", "jaboyd@email.com", 39, medications1, allergies1));
-				
+
+		List<ResidentInfo> expected = Arrays.asList(
+				new ResidentInfo("John", "Boyd", "1509 Culver St", "jaboyd@email.com", 39, medications1, allergies1));
+
 		// Exécution de la méthode à tester
 		List<ResidentInfo> actual = safetyService.getPersonInfo(firstName, lastName);
 
@@ -448,7 +455,7 @@ public class SafetyServiceTest {
 		assertEquals(expected.get(0).getMedications().get(1), actual.get(0).getMedications().get(1));
 		assertEquals(expected.get(0).getAllergies().get(0), actual.get(0).getAllergies().get(0));
 	}
-	
+
 	@Test
 	public void testGetAllPersonInfo() {
 
@@ -463,10 +470,10 @@ public class SafetyServiceTest {
 		allergies1.add("nillacilan");
 
 		// Résultat attendu
-		
-		List<ResidentInfo> expected = Arrays
-		.asList(new ResidentInfo("John", "Boyd", "1509 Culver St", "jaboyd@email.com", 39, medications1, allergies1));
-				
+
+		List<ResidentInfo> expected = Arrays.asList(
+				new ResidentInfo("John", "Boyd", "1509 Culver St", "jaboyd@email.com", 39, medications1, allergies1));
+
 		// Exécution de la méthode à tester
 		List<ResidentInfo> actual = safetyService.getPersonInfo(lastName);
 
