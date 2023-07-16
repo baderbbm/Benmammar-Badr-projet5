@@ -8,7 +8,8 @@ import com.openclassrooms.SafetyNetAlerts.model.dto.PersonCaserne;
 import com.openclassrooms.SafetyNetAlerts.model.dto.Resident;
 import com.openclassrooms.SafetyNetAlerts.model.dto.ResidentInfo;
 import com.openclassrooms.SafetyNetAlerts.model.dto.ResidentStation;
-import com.openclassrooms.SafetyNetAlerts.repository.PersonRepository;
+import com.openclassrooms.SafetyNetAlerts.repository.SafetyRepository;
+
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.Period;
@@ -20,10 +21,10 @@ import java.util.Map;
 @Service
 public class SafetyService {
 	
-    private PersonRepository personRepository; 
+    private SafetyRepository safetyRepository; 
 
-    public SafetyService(PersonRepository personRepository) {
-        this.personRepository = personRepository;
+    public SafetyService(SafetyRepository safetyRepository) {
+        this.safetyRepository = safetyRepository;
     }
 
     public FirestationCoverageResponse retrievePersonsByFirestation(String stationNumber) { 
@@ -86,7 +87,7 @@ public class SafetyService {
 	// Récupérer une liste d'adresses associées à une caserne de pompiers spécifique
 
 	public List<String> getAddressesByStationNumber(String stationNumber) {
-			List<Firestation> firestations = personRepository.extractFirestations(personRepository.loadData());
+			List<Firestation> firestations = safetyRepository.extractFirestations(safetyRepository.loadData());
 			List<String> addresses = new ArrayList<>();
 			for (Firestation firestation : firestations) {
 				if (firestation.getStation().equals(stationNumber)) {
@@ -100,7 +101,7 @@ public class SafetyService {
 	// données
 
 	public FirestationCoverageResponse getPeopleByAddresses(List<String> addresses) {
-			List<Person> people = personRepository.extractPeople(personRepository.loadData()); 
+			List<Person> people = safetyRepository.extractPeople(safetyRepository.loadData()); 
 
 			List<PersonCaserne> peopleByAddresses = new ArrayList<>();
 			int adultsCount = 0;
@@ -108,7 +109,7 @@ public class SafetyService {
 
 			// medicalRecords pour traiter les dates de naissances
 
-			List<Map<String, Object>> medicalRecords = personRepository.loadData().get("medicalrecords");
+			List<Map<String, Object>> medicalRecords = safetyRepository.loadData().get("medicalrecords");
 
 			for (Person person : people) {
 				if (addresses.contains(person.getAddress())) {
@@ -166,7 +167,7 @@ public class SafetyService {
 
 	public List<Person> getPeopleByAddress(String address) {
 
-			List<Person> people = personRepository.extractPeople(personRepository.loadData()); 
+			List<Person> people = safetyRepository.extractPeople(safetyRepository.loadData()); 
 
 			List<Person> peopleByAddresses = new ArrayList<>();
 
@@ -187,7 +188,7 @@ public class SafetyService {
 
 			List<Person> people = getPeopleByAddress(address);
 
-			List<Map<String, Object>> medicalRecords = personRepository.loadData().get("medicalrecords");
+			List<Map<String, Object>> medicalRecords = safetyRepository.loadData().get("medicalrecords");
 
 			List<Child> childrenByAddress = new ArrayList<>();
 
@@ -255,9 +256,9 @@ public class SafetyService {
 	
 	 public List<Resident> getResidentsByAddress(String address) {
 
-	            List<Person> people = personRepository.extractPeople(personRepository.loadData());
-	            List<Firestation> firestations = personRepository.extractFirestations(personRepository.loadData());
-	            List<MedicalRecord> medicalRecords = personRepository.extractMedicalRecords(personRepository.loadData());
+	            List<Person> people = safetyRepository.extractPeople(safetyRepository.loadData());
+	            List<Firestation> firestations = safetyRepository.extractFirestations(safetyRepository.loadData());
+	            List<MedicalRecord> medicalRecords = safetyRepository.extractMedicalRecords(safetyRepository.loadData());
 
 	            List<Resident> residents = new ArrayList<>();
 
@@ -316,9 +317,9 @@ public class SafetyService {
 	    
 	    public List<ResidentStation> getAllResidentsByFirestation(String stationNumber) {
 
-	            List<Person> people = personRepository.extractPeople(personRepository.loadData());
-	            List<Firestation> firestations = personRepository.extractFirestations(personRepository.loadData());
-	            List<MedicalRecord> medicalRecords = personRepository.extractMedicalRecords(personRepository.loadData());
+	            List<Person> people = safetyRepository.extractPeople(safetyRepository.loadData());
+	            List<Firestation> firestations = safetyRepository.extractFirestations(safetyRepository.loadData());
+	            List<MedicalRecord> medicalRecords = safetyRepository.extractMedicalRecords(safetyRepository.loadData());
 
 	            List<ResidentStation> residents = new ArrayList<>();
 
@@ -371,11 +372,11 @@ public class SafetyService {
 	            // Récupérer les résidents en fonction du prénom et du nom
 	           // List<Person> people = extractPeople(data);
 
-	            List<Person> people = getPeopleByFirstNameAndLastName(personRepository.extractPeople(personRepository.loadData()), firstName, lastName);
+	            List<Person> people = getPeopleByFirstNameAndLastName(safetyRepository.extractPeople(safetyRepository.loadData()), firstName, lastName);
 
 	            // Récupérer les informations complémentaires nécessaires (firestations, medicalrecords, etc.)
-	            List<Firestation> firestations = personRepository.extractFirestations(personRepository.loadData());
-	            List<MedicalRecord> medicalRecords = personRepository.extractMedicalRecords(personRepository.loadData());
+	            List<Firestation> firestations = safetyRepository.extractFirestations(safetyRepository.loadData());
+	            List<MedicalRecord> medicalRecords = safetyRepository.extractMedicalRecords(safetyRepository.loadData());
 
 	            // Parcourir les résidents et récupérer leurs informations
 	            for (Person person : people) {
@@ -434,11 +435,11 @@ public class SafetyService {
 	            // Récupérer les résidents en fonction du prénom et du nom
 	           // List<Person> people = extractPeople(data);
 
-	            List<Person> people = getPeopleByLastName(personRepository.extractPeople(personRepository.loadData()), lastName);
+	            List<Person> people = getPeopleByLastName(safetyRepository.extractPeople(safetyRepository.loadData()), lastName);
 
 	            // Récupérer les informations complémentaires nécessaires (firestations, medicalrecords, etc.)
-	            List<Firestation> firestations = personRepository.extractFirestations(personRepository.loadData());
-	            List<MedicalRecord> medicalRecords = personRepository.extractMedicalRecords(personRepository.loadData());
+	            List<Firestation> firestations = safetyRepository.extractFirestations(safetyRepository.loadData());
+	            List<MedicalRecord> medicalRecords = safetyRepository.extractMedicalRecords(safetyRepository.loadData());
 
 	            // Parcourir les résidents et récupérer leurs informations
 	            for (Person person : people) {
@@ -488,7 +489,7 @@ public class SafetyService {
 	    }
 
 	    public List<String> getCommunityEmailsByCity(String city) {
-	            List<Person> people = personRepository.extractPeople(personRepository.loadData());
+	            List<Person> people = safetyRepository.extractPeople(safetyRepository.loadData());
 	            List<String> emails = new ArrayList<>();
 	            for (Person person : people) {
 	                if (person.getCity().equals(city)) {
