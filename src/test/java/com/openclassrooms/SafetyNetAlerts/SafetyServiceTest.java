@@ -7,7 +7,7 @@ import com.openclassrooms.SafetyNetAlerts.model.dto.PersonCaserne;
 import com.openclassrooms.SafetyNetAlerts.model.dto.Resident;
 import com.openclassrooms.SafetyNetAlerts.model.dto.ResidentInfo;
 import com.openclassrooms.SafetyNetAlerts.model.dto.ResidentStation;
-import com.openclassrooms.SafetyNetAlerts.repository.PersonRepository;
+import com.openclassrooms.SafetyNetAlerts.repository.SafetyRepository;
 import com.openclassrooms.SafetyNetAlerts.service.SafetyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,13 +23,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SafetyServiceTest {
 	
     private SafetyService safetyService;
-    private PersonRepository personRepository;
+    private SafetyRepository safetyRepository;
 
 
     @BeforeEach
     public void setUp() {
-    	personRepository = new PersonRepository(Arrays.asList(new Person()));
-        safetyService = new SafetyService(personRepository);
+    	safetyRepository = new SafetyRepository(Arrays.asList(new Person()));
+        safetyService = new SafetyService(safetyRepository);
     }
     
    
