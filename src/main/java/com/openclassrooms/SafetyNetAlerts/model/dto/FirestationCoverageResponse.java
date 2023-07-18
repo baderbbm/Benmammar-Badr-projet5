@@ -6,8 +6,6 @@ import java.util.List;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
 
 public class FirestationCoverageResponse {
-	
-  
 
 	private List<PersonCaserne> people;   
     private int adultsCount;
@@ -36,12 +34,4 @@ public class FirestationCoverageResponse {
     public void setChildrenCount(int childrenCount) {
         this.childrenCount = childrenCount;
     }
-    
-    @Override
-  	public String toString() {
-  		return people + ", adultsCount=" + adultsCount + ", childrenCount="
-  				+ childrenCount + "]";
-  	}
-    
-    
 }
