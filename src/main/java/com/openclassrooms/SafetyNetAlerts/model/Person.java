@@ -23,13 +23,6 @@ public class Person {
     this.email = email;
 }
     
-    public Person(String firstName, String lastName, String address, String phone) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.address = address;
-    this.phone = phone;
-}
-    
     public String getFirstName() {
         return firstName;
     }
@@ -84,11 +77,5 @@ public class Person {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-
-    @Override
-    public String toString() {
-        return "[firstName=" + firstName + ", lastName=" + lastName + ", address=" + address + ", phone=" + phone + "]";
     }
 }
