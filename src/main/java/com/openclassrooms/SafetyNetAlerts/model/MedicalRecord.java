@@ -50,9 +50,4 @@ public class MedicalRecord {
 	        Period period = Period.between(birthDate, currentDate);
 	        return period.getYears();
 	    }
-		@Override
-		public String toString() {
-			return "[firstName=" + firstName + ", lastName=" + lastName + ", birthdate=" + birthdate
-					+ ", medications=" + medications + ", allergies=" + allergies + "]";
-		}
 }
