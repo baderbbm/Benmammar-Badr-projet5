@@ -9,16 +9,18 @@ import java.util.Map;
 @Repository
 public class FirestationRepository {
 
-	private List<Firestation> firestations;
+	private static List<Firestation> firestations;
 
-	public FirestationRepository(List<Firestation> firestations) {
-		this.firestations = firestations;
+	public List<Firestation> getFirestations() {
+		if (firestations == null)
+			firestations = extractFirestations(new SafetyRepository().loadData());
+		return firestations;
+
 	}
 
-	public List<Firestation> extractFirestations(Map<String, List<Map<String, Object>>> data) {
+	private List<Firestation> extractFirestations(Map<String, List<Map<String, Object>>> data) {
 		List<Map<String, Object>> firestationDataList = data.get("firestations");
 		List<Firestation> firestations = new ArrayList<>();
-
 		for (Map<String, Object> firestationData : firestationDataList) {
 			Firestation firestation = new Firestation();
 			firestation.setAddress((String) firestationData.get("address"));
@@ -27,6 +29,4 @@ public class FirestationRepository {
 		}
 		return firestations;
 	}
-
-
 }
