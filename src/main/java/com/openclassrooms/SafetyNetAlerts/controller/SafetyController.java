@@ -72,8 +72,8 @@ public class SafetyController {
     // de chaque habitant. Si plusieurs personnes portent le même nom, elles doivent toutes apparaître. 
     
     @GetMapping("/personInfo")
-    public List<ResidentInfo> getPersonInfoByName(@RequestParam("firstName") String firstName,
-                                            @RequestParam("lastName") String lastName) {
+    public List<ResidentInfo> getPersonInfoByName(@RequestParam(name="firstName", required=false) String firstName,
+                                            					@RequestParam("lastName") String lastName) {
         return safetyService.retrievePersonInfoByName(firstName, lastName); 
     }
     
