@@ -14,7 +14,6 @@ public class ResidentInfo {
 
 	public ResidentInfo(String firstName, String lastName, String adress, String email, int age,
 			List<String> medications, List<String> allergies) {
-		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.adress = adress;
