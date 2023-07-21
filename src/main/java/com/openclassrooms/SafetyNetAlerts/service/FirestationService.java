@@ -12,7 +12,8 @@ public class FirestationService {
 
 
     public FirestationService(FirestationRepository firestationRepository, SafetyRepository safetyRepository) {
-        this.firestations = firestationRepository.extractFirestations(safetyRepository.loadData());
+		this.firestations = firestationRepository.getFirestations();
+
     }
     
     public List<Firestation> getFirestations() {
@@ -52,8 +53,5 @@ public class FirestationService {
 
 	public void setFirestations(List<Firestation> firestations) {
 		this.firestations=firestations;
-	}
-    
-    
-    
+	}   
 }
