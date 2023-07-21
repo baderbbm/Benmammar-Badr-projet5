@@ -9,13 +9,16 @@ import java.util.Map;
 @Repository
 public class PersonRepository {
 
-	private List<Person> people;
+	private static List<Person> people;
 
-	public PersonRepository(List<Person> people) {
-		this.people = people;
+	public List<Person> getPeople() {
+		if (people == null)
+			people = extractPeople(new SafetyRepository().loadData());
+		return people;
+
 	}
-	
-	public List<Person> extractPeople(Map<String, List<Map<String, Object>>> data) {
+
+	private List<Person> extractPeople(Map<String, List<Map<String, Object>>> data) {
 		List<Map<String, Object>> personDataList = data.get("persons");
 		List<Person> people = new ArrayList<>();
 
@@ -33,5 +36,4 @@ public class PersonRepository {
 		return people;
 	}
 
-	
 }
