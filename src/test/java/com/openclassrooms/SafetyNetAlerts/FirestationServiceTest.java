@@ -16,12 +16,14 @@ import java.util.List;
 class FirestationServiceTest {
 	
    private FirestationService firestationService;
+   List<Firestation> firestations;
 
     @BeforeEach
     void setUp() {
         FirestationRepository firestationRepository = new FirestationRepository();
         SafetyRepository safetyRepository = new SafetyRepository();
-        List<Firestation> firestations = firestationRepository.extractFirestations(safetyRepository.loadData());
+       firestations = firestationRepository.getFirestations();
+
         firestationService = new FirestationService(firestationRepository, safetyRepository);
         firestationService.setFirestations(firestations);
     }
@@ -61,7 +63,7 @@ class FirestationServiceTest {
     }
 
     @Test
-    void deleteFirestation() {
+    void deleteFirestationByAddress() {
         // Créez une caserne d'incendie existante
         Firestation existingFirestation = new Firestation("123 Main Street", "1");
 
@@ -71,10 +73,29 @@ class FirestationServiceTest {
         firestationService.setFirestations(firestations);
 
         // Supprimez la caserne d'incendie en utilisant la méthode deleteFirestation
-        boolean success = firestationService.deleteFirestation(existingFirestation.getAddress(), existingFirestation.getStation());
+        boolean success = firestationService.deleteFirestationByAddress(existingFirestation.getAddress());
 
         // Vérifiez que la caserne d'incendie a été supprimée avec succès
         assertTrue(success);
         assertFalse(firestationService.getFirestations().contains(existingFirestation));
     }
+    
+    @Test
+    void deleteFirestationByStation() {
+        // Créez une caserne d'incendie existante
+        Firestation existingFirestation = new Firestation("123 Main Street", "1");
+
+        // Ajoutez la caserne d'incendie existante à la liste de casernes d'incendie du service
+        List<Firestation> firestations = new ArrayList<>();
+        firestations.add(existingFirestation);
+        firestationService.setFirestations(firestations);
+
+        // Supprimez la caserne d'incendie en utilisant la méthode deleteFirestation
+        boolean success = firestationService.deleteFirestationByStation(existingFirestation.getStation());
+
+        // Vérifiez que la caserne d'incendie a été supprimée avec succès
+        assertTrue(success);
+        assertFalse(firestationService.getFirestations().contains(existingFirestation));
+    }
+   
 }
