@@ -3,12 +3,10 @@ package com.openclassrooms.SafetyNetAlerts;
 import com.openclassrooms.SafetyNetAlerts.controller.FirestationController;
 import com.openclassrooms.SafetyNetAlerts.model.Firestation;
 import com.openclassrooms.SafetyNetAlerts.service.FirestationService;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -89,16 +87,16 @@ class FirestationControllerTest {
     @Test
     void deleteFirestation_ExistingFirestation_ReturnsOk() {
         
-        String address = "123 Main Street";
-        String station = "1";
-        when(firestationService.deleteFirestation(address, station)).thenReturn(true);
+        String address = "1509 Culver St";
+        String station = "3";
+        when(firestationService.deleteFirestationByStation(station)).thenReturn(true);
 
         
         ResponseEntity<Void> response = firestationController.deleteFirestation(address, station);
 
         
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        verify(firestationService, times(1)).deleteFirestation(address, station);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        verify(firestationService, times(0)).deleteFirestationByStation(station);
     }
 
     @Test
@@ -106,13 +104,28 @@ class FirestationControllerTest {
         
         String address = "123 Main Street";
         String station = "1";
-        when(firestationService.deleteFirestation(address, station)).thenReturn(false);
+        when(firestationService.deleteFirestationByAddress(address)).thenReturn(false);
 
         
         ResponseEntity<Void> response = firestationController.deleteFirestation(address, station);
 
         
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        verify(firestationService, times(1)).deleteFirestation(address, station);
+        verify(firestationService, times(1)).deleteFirestationByAddress(address);
+    }
+    
+    @Test
+    void deleteFirestation_NonExistingFirestation_ReturnsNotFoundd() {
+        
+        String address = null;
+        String station = "10";
+        when(firestationService.deleteFirestationByStation(station)).thenReturn(false);
+
+        
+        ResponseEntity<Void> response = firestationController.deleteFirestation(address, station);
+
+        
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        verify(firestationService, times(1)).deleteFirestationByStation(station);
     }
 }
