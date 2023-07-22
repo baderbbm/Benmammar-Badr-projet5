@@ -64,5 +64,4 @@ public class FirestationController {
 			return ResponseEntity.notFound().build();
 		}
 	}
-
 }
