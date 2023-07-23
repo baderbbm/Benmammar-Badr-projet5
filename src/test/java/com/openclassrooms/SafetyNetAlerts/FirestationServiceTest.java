@@ -14,88 +14,89 @@ import java.util.ArrayList;
 import java.util.List;
 
 class FirestationServiceTest {
-	
-   private FirestationService firestationService;
-   List<Firestation> firestations;
 
-    @BeforeEach
-    void setUp() {
-        FirestationRepository firestationRepository = new FirestationRepository();
-        SafetyRepository safetyRepository = new SafetyRepository();
-       firestations = firestationRepository.getFirestations();
+	private FirestationService firestationService;
+	List<Firestation> firestations;
 
-        firestationService = new FirestationService(firestationRepository, safetyRepository);
-        firestationService.setFirestations(firestations);
-    }
+	@BeforeEach
+	void setUp() {
+		FirestationRepository firestationRepository = new FirestationRepository();
+		firestations = firestationRepository.getFirestations();
+		firestationService = new FirestationService(firestationRepository);
+		firestationService.setFirestations(firestations);
+	}
 
-    @Test
-    void addFirestation() {
-        // Créez une caserne d'incendie de test
-        Firestation firestation = new Firestation("123 Main Street", "1");
+	@Test
+	void addFirestation() {
+		// Créez une caserne d'incendie de test
+		Firestation firestation = new Firestation("123 Main Street", "1");
 
-        // Ajoutez la caserne d'incendie en utilisant la méthode addFirestation
-        Firestation addedFirestation = firestationService.addFirestation(firestation);  
+		// Ajoutez la caserne d'incendie en utilisant la méthode addFirestation
+		Firestation addedFirestation = firestationService.addFirestation(firestation);
 
-        // Vérifiez que la caserne d'incendie a été ajoutée avec succès
-        assertNotNull(addedFirestation);
-        assertTrue(firestationService.getFirestations().contains(firestation));
-    }
+		// Vérifiez que la caserne d'incendie a été ajoutée avec succès
+		assertNotNull(addedFirestation);
+		assertTrue(firestationService.getFirestations().contains(firestation));
+	}
 
-    @Test
-    void updateFirestation() {
-        // Créez une caserne d'incendie existante
-        Firestation existingFirestation = new Firestation("123 Main Street", "1");
+	@Test
+	void updateFirestation() {
+		// Créez une caserne d'incendie existante
+		Firestation existingFirestation = new Firestation("123 Main Street", "1");
 
-        // Ajoutez la caserne d'incendie existante à la liste de casernes d'incendie du service
-        List<Firestation> firestations = new ArrayList<>();
-        firestations.add(existingFirestation);
-        firestationService.setFirestations(firestations);
+		// Ajoutez la caserne d'incendie existante à la liste de casernes d'incendie du
+		// service
+		List<Firestation> firestations = new ArrayList<>();
+		firestations.add(existingFirestation);
+		firestationService.setFirestations(firestations);
 
-        // Créez une caserne d'incendie de test avec des informations mises à jour
-        Firestation updatedFirestation = new Firestation("123 Main Street", "2");
+		// Créez une caserne d'incendie de test avec des informations mises à jour
+		Firestation updatedFirestation = new Firestation("123 Main Street", "2");
 
-        // Mettez à jour la caserne d'incendie en utilisant la méthode updateFirestation
-        Firestation result = firestationService.updateFirestation(updatedFirestation);
+		// Mettez à jour la caserne d'incendie en utilisant la méthode updateFirestation
+		Firestation result = firestationService.updateFirestation(updatedFirestation);
 
-        // Vérifiez que la caserne d'incendie a été mise à jour avec succès
-        assertNotNull(result);
-        assertEquals(updatedFirestation.getStation(), result.getStation());
-    }
+		// Vérifiez que la caserne d'incendie a été mise à jour avec succès
+		assertNotNull(result);
+		assertEquals(updatedFirestation.getStation(), result.getStation());
+	}
 
-    @Test
-    void deleteFirestationByAddress() {
-        // Créez une caserne d'incendie existante
-        Firestation existingFirestation = new Firestation("123 Main Street", "1");
+	@Test
+	void deleteFirestationByAddress() {
+		// Créez une caserne d'incendie existante
+		Firestation existingFirestation = new Firestation("123 Main Street", "1");
 
-        // Ajoutez la caserne d'incendie existante à la liste de casernes d'incendie du service
-        List<Firestation> firestations = new ArrayList<>();
-        firestations.add(existingFirestation);
-        firestationService.setFirestations(firestations);
+		// Ajoutez la caserne d'incendie existante à la liste de casernes d'incendie du
+		// service
+		List<Firestation> firestations = new ArrayList<>();
+		firestations.add(existingFirestation);
+		firestationService.setFirestations(firestations);
 
-        // Supprimez la caserne d'incendie en utilisant la méthode deleteFirestation
-        boolean success = firestationService.deleteFirestationByAddress(existingFirestation.getAddress());
+		// Supprimez la caserne d'incendie en utilisant la méthode deleteFirestation
+		boolean success = firestationService.deleteFirestationByAddress(existingFirestation.getAddress());
 
-        // Vérifiez que la caserne d'incendie a été supprimée avec succès
-        assertTrue(success);
-        assertFalse(firestationService.getFirestations().contains(existingFirestation));
-    }
-    
-    @Test
-    void deleteFirestationByStation() {
-        // Créez une caserne d'incendie existante
-        Firestation existingFirestation = new Firestation("123 Main Street", "1");
+		// Vérifiez que la caserne d'incendie a été supprimée avec succès
+		assertTrue(success);
+		assertFalse(firestationService.getFirestations().contains(existingFirestation));
+	}
 
-        // Ajoutez la caserne d'incendie existante à la liste de casernes d'incendie du service
-        List<Firestation> firestations = new ArrayList<>();
-        firestations.add(existingFirestation);
-        firestationService.setFirestations(firestations);
+	@Test
+	void deleteFirestationByStation() {
+		// Créez une caserne d'incendie existante
+		Firestation existingFirestation = new Firestation("123 Main Street", "1");
 
-        // Supprimez la caserne d'incendie en utilisant la méthode deleteFirestation
-        boolean success = firestationService.deleteFirestationByStation(existingFirestation.getStation());
+		// Ajoutez la caserne d'incendie existante à la liste de casernes d'incendie du
+		// service
+		List<Firestation> firestations = new ArrayList<>();
+		firestations.add(existingFirestation);
+		firestationService.setFirestations(firestations);
 
-        // Vérifiez que la caserne d'incendie a été supprimée avec succès
-        assertTrue(success);
-        assertFalse(firestationService.getFirestations().contains(existingFirestation));
-    }
-   
+		// Supprimez la caserne d'incendie en utilisant la méthode deleteFirestation
+		boolean success = firestationService.deleteFirestationByStation(existingFirestation.getStation());
+
+		// Vérifiez que la caserne d'incendie a été supprimée avec succès
+		assertTrue(success);
+		assertFalse(firestationService.getFirestations().contains(existingFirestation));
+	}
+
 }
