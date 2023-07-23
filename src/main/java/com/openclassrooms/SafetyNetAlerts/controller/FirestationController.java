@@ -45,7 +45,7 @@ public class FirestationController {
 	// Supprimer le mapping d'une caserne ou d'une adresse
 	@DeleteMapping
 	public ResponseEntity<Void> deleteFirestation(@RequestParam(value = "address", required = false) String address,
-												  @RequestParam(value = "station", required = false) String station) {
+			@RequestParam(value = "station", required = false) String station) {
 		if (address == null && station == null) {
 			return ResponseEntity.badRequest().build(); // Require at least one parameter (address or station)
 		}
