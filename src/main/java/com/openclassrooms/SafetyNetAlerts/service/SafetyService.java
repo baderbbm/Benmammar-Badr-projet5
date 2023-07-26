@@ -4,7 +4,7 @@ import com.openclassrooms.SafetyNetAlerts.model.Firestation;
 import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
 import com.openclassrooms.SafetyNetAlerts.model.dto.Child;
-import com.openclassrooms.SafetyNetAlerts.model.dto.FirestationCoverageResponse;
+import com.openclassrooms.SafetyNetAlerts.model.dto.FirestationCoverage;
 import com.openclassrooms.SafetyNetAlerts.model.dto.PersonCaserne;
 import com.openclassrooms.SafetyNetAlerts.model.dto.Resident;
 import com.openclassrooms.SafetyNetAlerts.model.dto.ResidentInfo;
@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class SafetyService {
@@ -38,9 +39,9 @@ public class SafetyService {
 		this.medicalRecordRepository = medicalRecordRepository;
 	}
 
-	public FirestationCoverageResponse retrievePersonsByFirestation(String stationNumber) {
+	public FirestationCoverage retrievePersonsByFirestation(String stationNumber) {
 		if (stationNumber.isEmpty()) {
-			return new FirestationCoverageResponse();
+			return new FirestationCoverage();
 		}
 		return getPeopleByAddresses(getAddressesByStationNumber(stationNumber));
 	}
@@ -108,69 +109,58 @@ public class SafetyService {
 	// Récupérer des informations sur les personnes associées à une liste d'adresses
 	// données
 
-	public FirestationCoverageResponse getPeopleByAddresses(List<String> addresses) {
-		// List<Person> people =
-		// personRepository.extractPeople(safetyRepository.loadData());
-		List<Person> people = personRepository.getPeople();
 
-		List<PersonCaserne> peopleByAddresses = new ArrayList<>();
-		int adultsCount = 0;
-		int childrenCount = 0;
+	public FirestationCoverage getPeopleByAddresses(List<String> addresses) {
+		
+	    List<Person> people = personRepository.getPeople();
+	    List<MedicalRecord> medicalRecords = medicalRecordRepository.getMedicalRecord();
 
-		// medicalRecords pour traiter les dates de naissances
+	    List<PersonCaserne> peopleByAddresses = new ArrayList<>();
+	    int adultsCount = 0;
+	    int childrenCount = 0;
 
-		List<Map<String, Object>> medicalRecords = safetyRepository.loadData().get("medicalrecords");
+	    for (String address : addresses) {
+	        for (Person person : people) {
+	            if (address.equals(person.getAddress())) {
+	                PersonCaserne personCaserne = new PersonCaserne();
 
-		for (Person person : people) {
-			if (addresses.contains(person.getAddress())) {
-				PersonCaserne personCaserne = new PersonCaserne();
+	                personCaserne.setFirstName(person.getFirstName());
+	                personCaserne.setLastName(person.getLastName());
+	                personCaserne.setAddress(person.getAddress());
+	                personCaserne.setPhone(person.getPhone());
 
-				// Optional est utilisé pour représenter une valeur qui peut être présente ou
-				// absente
-				// Le flux est ensuite filtré en utilisant la méthode filter() avec une
-				// expression lambda
-				// findFirst() est ensuite appelée sur le flux filtré pour récupérer le premier
-				// élément correspondant
+	                Optional<MedicalRecord> medicalRecordOptional = medicalRecords.stream()
+	                        .filter(record -> record.getFirstName().equals(person.getFirstName())
+	                                && record.getLastName().equals(person.getLastName()))
+	                        .findFirst();
 
-				java.util.Optional<Map<String, Object>> medicalRecordOptional = medicalRecords.stream()
-						.filter(record -> record.get("firstName").equals(person.getFirstName())
-								&& record.get("lastName").equals(person.getLastName()))
-						.findFirst();
+	                if (medicalRecordOptional.isPresent()) {
+	                    MedicalRecord medicalRecord = medicalRecordOptional.get();
 
-				if (medicalRecordOptional.isPresent()) {
-					Map<String, Object> medicalRecord = medicalRecordOptional.get();
+	                    LocalDate birthDate = medicalRecord.getBirthdate();
+	                    LocalDate currentDate = LocalDate.now();
+	                    Period period = Period.between(birthDate, currentDate);
 
-					// PersonCaserne personCaserne = new PersonCaserne();
-					personCaserne.setFirstName(person.getFirstName());
-					personCaserne.setLastName(person.getLastName());
-					personCaserne.setAddress(person.getAddress());
-					personCaserne.setPhone(person.getPhone());
+	                    if (period.getYears() <= 18) {
+	                        childrenCount++;
+	                    } else {
+	                        adultsCount++;
+	                    }
+	                }
 
-					// Set birthdate
-					String birthdateString = (String) medicalRecord.get("birthdate");
-					LocalDate birthDate = LocalDate.parse(birthdateString, DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-					LocalDate currentDate = LocalDate.now();
-					Period period = Period.between(birthDate, currentDate);
+	                peopleByAddresses.add(personCaserne);
+	            }
+	        }
+	    }
 
-					if (period.getYears() <= 18) {
-						childrenCount++;
-					} else {
-						adultsCount++;
-					}
-				}
+	    FirestationCoverage response = new FirestationCoverage();
+	    response.setPeople(peopleByAddresses);
+	    response.setAdultsCount(adultsCount);
+	    response.setChildrenCount(childrenCount);
 
-				peopleByAddresses.add(personCaserne);
-
-			}
-		}
-
-		FirestationCoverageResponse response = new FirestationCoverageResponse();
-		response.setPeople(peopleByAddresses);
-		response.setAdultsCount(adultsCount);
-		response.setChildrenCount(childrenCount);
-
-		return response;
+	    return response;
 	}
+
 
 	// Récupère une liste de personnes en fonction d'une adresse donnée
 
@@ -192,37 +182,34 @@ public class SafetyService {
 	// liste des membres de ce foyer
 
 	public List<Child> getChildrenByAddress(String address) {
+	    List<Person> people = getPeopleByAddress(address);
+	    List<MedicalRecord> medicalRecords = medicalRecordRepository.getMedicalRecord();
 
-		List<Person> people = getPeopleByAddress(address);
+	    List<Child> childrenByAddress = new ArrayList<>();
 
-		List<Map<String, Object>> medicalRecords = safetyRepository.loadData().get("medicalrecords");
+	    for (Person person : people) {
+	        Optional<MedicalRecord> medicalRecordOptional = medicalRecords.stream()
+	                .filter(record -> record.getFirstName().equals(person.getFirstName())
+	                        && record.getLastName().equals(person.getLastName()))
+	                .findFirst();
 
-		List<Child> childrenByAddress = new ArrayList<>();
+	        if (medicalRecordOptional.isPresent()) {
+	            MedicalRecord medicalRecord = medicalRecordOptional.get();
+	            LocalDate birthDate = medicalRecord.getBirthdate();
+	            LocalDate currentDate = LocalDate.now();
+	            Period period = Period.between(birthDate, currentDate);
 
-		for (Person person : people) {
+	            if (period.getYears() <= 18) {
+	                List<String> householdMembers = getHouseholdMembers(person, address);
+	                Child child = new Child(person.getFirstName(), person.getLastName(), period.getYears(), householdMembers);
+	                childrenByAddress.add(child);
+	            }
+	        }
+	    }
 
-			java.util.Optional<Map<String, Object>> medicalRecordOptional = medicalRecords.stream()
-					.filter(record -> record.get("firstName").equals(person.getFirstName())
-							&& record.get("lastName").equals(person.getLastName()))
-					.findFirst();
-			if (medicalRecordOptional.isPresent()) {
-				Map<String, Object> medicalRecord = medicalRecordOptional.get();
-				// Set birthdate
-				String birthdateString = (String) medicalRecord.get("birthdate");
-				LocalDate birthDate = LocalDate.parse(birthdateString, DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-				LocalDate currentDate = LocalDate.now();
-				Period period = Period.between(birthDate, currentDate);
-
-				if (period.getYears() <= 18) {
-					List<String> householdMembers = getHouseholdMembers(person, address);
-					Child child = new Child(person.getFirstName(), person.getLastName(), period.getYears(),
-							householdMembers);
-					childrenByAddress.add(child);
-				}
-			}
-		}
-		return childrenByAddress;
+	    return childrenByAddress;
 	}
+
 
 	// Retourne une liste des membres du foyer d'une personne
 
