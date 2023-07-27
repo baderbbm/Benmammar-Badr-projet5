@@ -39,12 +39,16 @@ public class SafetyService {
 		this.medicalRecordRepository = medicalRecordRepository;
 	}
 
+	// retourner une liste des personnes couvertes par la caserne de pompiers correspondante
+	
 	public FirestationCoverage retrievePersonsByFirestation(String stationNumber) {
 		if (stationNumber.isEmpty()) {
 			return new FirestationCoverage();
 		}
 		return getPeopleByAddresses(getAddressesByStationNumber(stationNumber));
 	}
+	
+	// retourner une liste d'enfants habitant à cette adresse
 
 	public List<Child> retrieveChildrenByAddress(String address) {
 		if (address.isEmpty()) {
@@ -53,12 +57,18 @@ public class SafetyService {
 		return getChildrenByAddress(address);
 	}
 
+	// retourner une liste des numéros de téléphone des résidents desservis par la
+	// caserne de pompiers
+
 	public List<String> retrievePhoneNumbersByFirestation(String firestationNumber) {
 		if (firestationNumber.isEmpty()) {
 			return new ArrayList<String>();
 		}
 		return getPhoneNumbersByStationNumber(firestationNumber);
 	}
+
+	// retourner la liste des habitants vivant à l’adresse donnée ainsi que le
+	// numéro de la caserne de pompiers la desservant
 
 	public List<Resident> retrieveResidentsByAddress(String address) {
 		if (address.isEmpty()) {
@@ -67,12 +77,18 @@ public class SafetyService {
 		return getResidentsByAddress(address);
 	}
 
+	// retourner une liste de tous les foyers desservis par la caserne
+
 	public List<ResidentStation> retrieveHouseholdsByStations(String stationNumbers) {
 		if (stationNumbers.isEmpty()) {
 			return new ArrayList<ResidentStation>();
 		}
 		return getAllResidentsByFirestation(stationNumbers);
 	}
+
+	// retourner le nom, l'adresse, l'âge, l'adresse mail
+	// et les antécédents médicaux (médicaments, posologie, allergies) de chaque
+	// habitant
 
 	public List<ResidentInfo> retrievePersonInfoByName(String firstName, String lastName) {
 		if ((firstName == null || firstName.isEmpty()) && lastName.isEmpty()) {
@@ -84,6 +100,8 @@ public class SafetyService {
 
 		return getPersonInfo(firstName, lastName);
 	}
+
+	// retourner les adresses mail de tous les habitants de la ville
 
 	public List<String> retrieveCommunityEmailsByCity(String city) {
 		if (city.isEmpty()) {
@@ -109,58 +127,56 @@ public class SafetyService {
 	// Récupérer des informations sur les personnes associées à une liste d'adresses
 	// données
 
-
 	public FirestationCoverage getPeopleByAddresses(List<String> addresses) {
-		
-	    List<Person> people = personRepository.getPeople();
-	    List<MedicalRecord> medicalRecords = medicalRecordRepository.getMedicalRecord();
 
-	    List<PersonCaserne> peopleByAddresses = new ArrayList<>();
-	    int adultsCount = 0;
-	    int childrenCount = 0;
+		List<Person> people = personRepository.getPeople();
+		List<MedicalRecord> medicalRecords = medicalRecordRepository.getMedicalRecord();
 
-	    for (String address : addresses) {
-	        for (Person person : people) {
-	            if (address.equals(person.getAddress())) {
-	                PersonCaserne personCaserne = new PersonCaserne();
+		List<PersonCaserne> peopleByAddresses = new ArrayList<>();
+		int adultsCount = 0;
+		int childrenCount = 0;
 
-	                personCaserne.setFirstName(person.getFirstName());
-	                personCaserne.setLastName(person.getLastName());
-	                personCaserne.setAddress(person.getAddress());
-	                personCaserne.setPhone(person.getPhone());
+		for (String address : addresses) {
+			for (Person person : people) {
+				if (address.equals(person.getAddress())) {
+					PersonCaserne personCaserne = new PersonCaserne();
 
-	                Optional<MedicalRecord> medicalRecordOptional = medicalRecords.stream()
-	                        .filter(record -> record.getFirstName().equals(person.getFirstName())
-	                                && record.getLastName().equals(person.getLastName()))
-	                        .findFirst();
+					personCaserne.setFirstName(person.getFirstName());
+					personCaserne.setLastName(person.getLastName());
+					personCaserne.setAddress(person.getAddress());
+					personCaserne.setPhone(person.getPhone());
 
-	                if (medicalRecordOptional.isPresent()) {
-	                    MedicalRecord medicalRecord = medicalRecordOptional.get();
+					Optional<MedicalRecord> medicalRecordOptional = medicalRecords.stream()
+							.filter(record -> record.getFirstName().equals(person.getFirstName())
+									&& record.getLastName().equals(person.getLastName()))
+							.findFirst();
 
-	                    LocalDate birthDate = medicalRecord.getBirthdate();
-	                    LocalDate currentDate = LocalDate.now();
-	                    Period period = Period.between(birthDate, currentDate);
+					if (medicalRecordOptional.isPresent()) {
+						MedicalRecord medicalRecord = medicalRecordOptional.get();
 
-	                    if (period.getYears() <= 18) {
-	                        childrenCount++;
-	                    } else {
-	                        adultsCount++;
-	                    }
-	                }
+						LocalDate birthDate = medicalRecord.getBirthdate();
+						LocalDate currentDate = LocalDate.now();
+						Period period = Period.between(birthDate, currentDate);
 
-	                peopleByAddresses.add(personCaserne);
-	            }
-	        }
-	    }
+						if (period.getYears() <= 18) {
+							childrenCount++;
+						} else {
+							adultsCount++;
+						}
+					}
 
-	    FirestationCoverage response = new FirestationCoverage();
-	    response.setPeople(peopleByAddresses);
-	    response.setAdultsCount(adultsCount);
-	    response.setChildrenCount(childrenCount);
+					peopleByAddresses.add(personCaserne);
+				}
+			}
+		}
 
-	    return response;
+		FirestationCoverage response = new FirestationCoverage();
+		response.setPeople(peopleByAddresses);
+		response.setAdultsCount(adultsCount);
+		response.setChildrenCount(childrenCount);
+
+		return response;
 	}
-
 
 	// Récupère une liste de personnes en fonction d'une adresse donnée
 
@@ -182,34 +198,34 @@ public class SafetyService {
 	// liste des membres de ce foyer
 
 	public List<Child> getChildrenByAddress(String address) {
-	    List<Person> people = getPeopleByAddress(address);
-	    List<MedicalRecord> medicalRecords = medicalRecordRepository.getMedicalRecord();
+		List<Person> people = getPeopleByAddress(address);
+		List<MedicalRecord> medicalRecords = medicalRecordRepository.getMedicalRecord();
 
-	    List<Child> childrenByAddress = new ArrayList<>();
+		List<Child> childrenByAddress = new ArrayList<>();
 
-	    for (Person person : people) {
-	        Optional<MedicalRecord> medicalRecordOptional = medicalRecords.stream()
-	                .filter(record -> record.getFirstName().equals(person.getFirstName())
-	                        && record.getLastName().equals(person.getLastName()))
-	                .findFirst();
+		for (Person person : people) {
+			Optional<MedicalRecord> medicalRecordOptional = medicalRecords.stream()
+					.filter(record -> record.getFirstName().equals(person.getFirstName())
+							&& record.getLastName().equals(person.getLastName()))
+					.findFirst();
 
-	        if (medicalRecordOptional.isPresent()) {
-	            MedicalRecord medicalRecord = medicalRecordOptional.get();
-	            LocalDate birthDate = medicalRecord.getBirthdate();
-	            LocalDate currentDate = LocalDate.now();
-	            Period period = Period.between(birthDate, currentDate);
+			if (medicalRecordOptional.isPresent()) {
+				MedicalRecord medicalRecord = medicalRecordOptional.get();
+				LocalDate birthDate = medicalRecord.getBirthdate();
+				LocalDate currentDate = LocalDate.now();
+				Period period = Period.between(birthDate, currentDate);
 
-	            if (period.getYears() <= 18) {
-	                List<String> householdMembers = getHouseholdMembers(person, address);
-	                Child child = new Child(person.getFirstName(), person.getLastName(), period.getYears(), householdMembers);
-	                childrenByAddress.add(child);
-	            }
-	        }
-	    }
+				if (period.getYears() <= 18) {
+					List<String> householdMembers = getHouseholdMembers(person, address);
+					Child child = new Child(person.getFirstName(), person.getLastName(), period.getYears(),
+							householdMembers);
+					childrenByAddress.add(child);
+				}
+			}
+		}
 
-	    return childrenByAddress;
+		return childrenByAddress;
 	}
-
 
 	// Retourne une liste des membres du foyer d'une personne
 
@@ -314,6 +330,9 @@ public class SafetyService {
 		return -1; // L'âge n'a pas pu être trouvé
 	}
 
+	// récupérer des informations détaillées sur tous les résidents résidant
+	// à des adresses desservies par une caserne de pompiers spécifiée
+
 	public List<ResidentStation> getAllResidentsByFirestation(String stationNumber) {
 
 		List<Person> people = personRepository.getPeople();
@@ -359,13 +378,16 @@ public class SafetyService {
 		return residents;
 	}
 
-	public List<ResidentInfo> getPersonInfo(String firstName, String lastName) {
+	// prend un prénom et un nom de famille en entrée, récupère les informations des
+	// résidents correspondants
+	// à partir de différentes sources de données, les combine dans des objets
+	// ResidentInfo, puis renvoie
+	// une liste contenant ces informations pour tous les résidents correspondants
 
-		// System.out.println(firstName+" "+lastName);
+	public List<ResidentInfo> getPersonInfo(String firstName, String lastName) {
 		List<ResidentInfo> residents = new ArrayList<>();
 
 		// Récupérer les résidents en fonction du prénom et du nom
-		// List<Person> people = extractPeople(data);
 
 		List<Person> people = getPeopleByFirstNameAndLastName(personRepository.getPeople(), firstName, lastName);
 
@@ -381,7 +403,6 @@ public class SafetyService {
 			resident.setLastName(person.getLastName());
 			resident.setAdress(person.getAddress());
 			resident.setEmail(person.getEmail());
-			// resident.setPhone(person.getPhone());
 			int personAge = getAgeFromMedicalRecords(person, medicalRecords);
 			resident.setAge(personAge);
 
@@ -409,6 +430,12 @@ public class SafetyService {
 		return residents;
 	}
 
+	// prend une liste de personnes, un prénom et un nom de famille en entrée,
+	// filtre la liste pour ne conserver que
+	// les personnes ayant le prénom et le nom de famille spécifiés, puis retourne
+	// une nouvelle liste contenant
+	// ces personnes filtrées
+
 	public List<Person> getPeopleByFirstNameAndLastName(List<Person> people, String firstName, String lastName) {
 		List<Person> matchingPeople = new ArrayList<>();
 
@@ -426,7 +453,6 @@ public class SafetyService {
 		List<ResidentInfo> residents = new ArrayList<>();
 
 		// Récupérer les résidents en fonction du prénom et du nom
-		// List<Person> people = extractPeople(data);
 
 		List<Person> people = getPeopleByLastName(personRepository.getPeople(), lastName);
 
@@ -471,9 +497,13 @@ public class SafetyService {
 		return residents;
 	}
 
+	// prend une liste de personnes et un nom de famille en entrée, filtre la liste
+	// pour ne conserver
+	// que les personnes ayant le nom de famille spécifié, puis retourne une
+	// nouvelle liste contenant ces personnes filtrées
+
 	public List<Person> getPeopleByLastName(List<Person> people, String lastName) {
 		List<Person> matchingPeople = new ArrayList<>();
-
 		for (Person person : people) {
 			if (person.getLastName().equals(lastName)) {
 				matchingPeople.add(person);
@@ -482,6 +512,10 @@ public class SafetyService {
 
 		return matchingPeople;
 	}
+
+	// récupère une liste de personnes, filtre celles qui résident
+	// dans la ville spécifiée et renvoie une liste d'adresses e-mail
+	// correspondantes
 
 	public List<String> getCommunityEmailsByCity(String city) {
 		List<Person> people = personRepository.getPeople();
