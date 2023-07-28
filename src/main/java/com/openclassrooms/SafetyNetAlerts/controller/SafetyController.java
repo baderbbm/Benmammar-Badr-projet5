@@ -1,13 +1,14 @@
 package com.openclassrooms.SafetyNetAlerts.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.openclassrooms.SafetyNetAlerts.model.dto.Child; 
-import com.openclassrooms.SafetyNetAlerts.model.dto.FirestationCoverageResponse;
+import com.openclassrooms.SafetyNetAlerts.model.dto.Child;
+import com.openclassrooms.SafetyNetAlerts.model.dto.FirestationCoverage;
 import com.openclassrooms.SafetyNetAlerts.model.dto.Resident;
 import com.openclassrooms.SafetyNetAlerts.model.dto.ResidentInfo;
 import com.openclassrooms.SafetyNetAlerts.model.dto.ResidentStation;
@@ -28,7 +29,7 @@ public class SafetyController {
     
     
     @GetMapping("/firestation")
-    public FirestationCoverageResponse getPersonsByFirestation(@RequestParam("stationNumber") String stationNumber) {
+    public FirestationCoverage getPersonsByFirestation(@RequestParam("stationNumber") String stationNumber) {
         return safetyService.retrievePersonsByFirestation(stationNumber);
     }
     
@@ -59,13 +60,13 @@ public class SafetyController {
     }
     
    
-    // Retourner une liste de tous les foyers desservis par la caserne. Cette liste doit regrouper les personnes par adresse. 
+    // Retourner une liste de tous les foyers desservis par les casernes. Cette liste doit regrouper les personnes par adresse. 
     // Elle doit aussi inclure le nom, le numéro de téléphone et l'âge des habitants, 
     // et faire figurer leurs antécédents médicaux (médicaments, posologie et allergies) à côté de chaque nom. 
     
     @GetMapping("/flood/stations")
-    public  List<ResidentStation> getHouseholdsByStations(@RequestParam("stations") String stationNumbers) {
-        return safetyService.retrieveHouseholdsByStations(stationNumbers);
+    public List<ResidentStation> getHouseholdsByStations(@RequestParam("stations") String stationNumbers) {
+        return safetyService.getAllResidentsByFirestations(Arrays.asList(stationNumbers.split(",")));
     }
     
     // Retourner le nom, l'adresse, l'âge, l'adresse mail et les antécédents médicaux (médicaments, posologie, allergies) 
@@ -73,7 +74,7 @@ public class SafetyController {
     
     @GetMapping("/personInfo")
     public List<ResidentInfo> getPersonInfoByName(@RequestParam(name="firstName", required=false) String firstName,
-                                            					@RequestParam("lastName") String lastName) {
+                                            	  @RequestParam("lastName") String lastName) {
         return safetyService.retrievePersonInfoByName(firstName, lastName); 
     }
     
