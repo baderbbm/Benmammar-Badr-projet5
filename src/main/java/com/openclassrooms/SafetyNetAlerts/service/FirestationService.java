@@ -6,27 +6,26 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import com.openclassrooms.SafetyNetAlerts.model.Firestation;
 import com.openclassrooms.SafetyNetAlerts.repository.FirestationRepository;
-import com.openclassrooms.SafetyNetAlerts.repository.SafetyRepository;
 
 @Service
 public class FirestationService {
-	private List<Firestation> firestations;
+	private FirestationRepository firestationRepository;
 
-	public FirestationService(FirestationRepository firestationRepository) {
-		this.firestations = firestationRepository.getFirestations();
+ public FirestationService(FirestationRepository firestationRepository) {
+		this.firestationRepository = firestationRepository;
 	}
 
 	public List<Firestation> getFirestations() {
-		return firestations;
+		return firestationRepository.getFirestations();
 	}
-
+	
 	public Firestation addFirestation(Firestation firestation) {
-		firestations.add(firestation);
+		getFirestations().add(firestation);
 		return firestation;
 	}
 
 	public Firestation updateFirestation(Firestation firestation) {
-		for (Firestation existingFirestation : firestations) {
+		for (Firestation existingFirestation : getFirestations()) {
 			if (existingFirestation.getAddress().equals(firestation.getAddress())) {
 				existingFirestation.setStation(firestation.getStation());
 				return existingFirestation;
@@ -37,14 +36,14 @@ public class FirestationService {
 
 	public boolean deleteFirestationByAddress(String address) {
 		Firestation foundFirestation = null;
-		for (Firestation firestation : firestations) {
+		for (Firestation firestation : getFirestations()) {
 			if (firestation.getAddress().equals(address)) {
 				foundFirestation = firestation;
 				break;
 			}
 		}
 		if (foundFirestation != null) {
-			firestations.remove(foundFirestation);
+			getFirestations().remove(foundFirestation);
 			return true;
 		} else {
 			return false;
@@ -53,7 +52,7 @@ public class FirestationService {
 
 	public boolean deleteFirestationByStation(String station) {
 		boolean foundFirestation = false;
-		Iterator<Firestation> iterator = firestations.iterator();
+		Iterator<Firestation> iterator = getFirestations().iterator();
 
 		while (iterator.hasNext()) {
 			Firestation firestation = iterator.next();
@@ -66,7 +65,4 @@ public class FirestationService {
 		return foundFirestation;
 	}
 
-	public void setFirestations(List<Firestation> firestations) {
-		this.firestations = firestations;
-	}
 }
