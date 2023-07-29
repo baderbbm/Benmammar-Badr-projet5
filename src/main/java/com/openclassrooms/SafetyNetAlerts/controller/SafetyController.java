@@ -12,7 +12,6 @@ import com.openclassrooms.SafetyNetAlerts.model.dto.Child;
 import com.openclassrooms.SafetyNetAlerts.model.dto.FirestationCoverage;
 import com.openclassrooms.SafetyNetAlerts.model.dto.Resident;
 import com.openclassrooms.SafetyNetAlerts.model.dto.ResidentInfo;
-import com.openclassrooms.SafetyNetAlerts.model.dto.ResidentStation;
 import com.openclassrooms.SafetyNetAlerts.service.SafetyService;
 
 @RestController
@@ -24,7 +23,6 @@ public class SafetyController {
     }
 
     // Retourner une liste des personnes couvertes par la caserne de pompiers correspondante. 
-    // Si le numéro de station = 1, elle doit renvoyer les habitants couverts par la station numéro 1. 
     // La liste doit inclure les informations spécifiques suivantes : prénom, nom, adresse, numéro de téléphone. 
     // De plus, elle doit fournir un décompte du nombre d'adultes et du nombre d'enfants dans la zone desservie 
     
@@ -34,17 +32,15 @@ public class SafetyController {
         return safetyService.retrievePersonsByFirestation(stationNumber);
     }
     
-    // Retourner une liste d'enfants habitant à cette adresse. La liste doit comprendre le prénom et le nom de famille 
-    // de chaque enfant, son âge et une liste des autres membres du foyer 
+    // Retourner une liste d'enfants habitant à cette adresse. 
+    // La liste doit comprendre le prénom et le nom de famille de chaque enfant, son âge et une liste des autres membres du foyer. 
 
     @GetMapping("/childAlert")
     public List<Child>   getChildrenByAddress(@RequestParam("address") String address) {
         return safetyService.retrieveChildrenByAddress(address);
     }
      
-    // Retourner une liste des numéros de téléphone des résidents desservis par la caserne de pompiers. 
-    // Nous l'utiliserons pour envoyer des messages texte d'urgence à des foyers spécifiques 
-     
+    // Retourner une liste des numéros de téléphone des résidents desservis par la caserne de pompiers.      
     
     @GetMapping("/phoneAlert")
     public List<String> getPhoneNumbersByFirestation(@RequestParam("firestation") String firestationNumber) {
@@ -60,7 +56,6 @@ public class SafetyController {
         return safetyService.retrieveResidentsByAddress(address); 
     }
     
-   
     // Retourner une liste de tous les foyers desservis par les casernes. Cette liste doit regrouper les personnes par adresse. 
     // Elle doit aussi inclure le nom, le numéro de téléphone et l'âge des habitants, 
     // et faire figurer leurs antécédents médicaux (médicaments, posologie et allergies) à côté de chaque nom. 
