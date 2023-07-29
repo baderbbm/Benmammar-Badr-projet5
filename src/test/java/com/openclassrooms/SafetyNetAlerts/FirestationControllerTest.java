@@ -1,67 +1,133 @@
-package com.openclassrooms.SafetyNetAlerts.controller;
+package com.openclassrooms.SafetyNetAlerts;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
+import com.openclassrooms.SafetyNetAlerts.controller.FirestationController;
 import com.openclassrooms.SafetyNetAlerts.model.Firestation;
 import com.openclassrooms.SafetyNetAlerts.service.FirestationService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@RestController
-@RequestMapping("/firestation")
-public class FirestationController {
-	private FirestationService firestationService;
+class FirestationControllerTest {
+    private FirestationService firestationService;
+    private FirestationController firestationController;
 
-	public FirestationController(FirestationService firestationService) {
-		this.firestationService = firestationService;
-	}
+    @BeforeEach
+    void setUp() {
+        firestationService = mock(FirestationService.class);
+        firestationController = new FirestationController(firestationService);
+    }
 
-	// Ajouter un mapping caserne/adresse
-	@PostMapping
-	public ResponseEntity<Firestation> addFirestation(@RequestParam("address") String address,
-			@RequestParam("station") String station) {
-		Firestation firestation = new Firestation(address, station);
-		Firestation addedFirestation = firestationService.addFirestation(firestation);
-		if (addedFirestation != null) {
-			return ResponseEntity.ok(addedFirestation);
-		} else {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
-	}
+    @Test
+    void addFirestation_ValidInput_ReturnsAddedFirestation() {
+        String address = "123 Main Street";
+        String station = "1";
+        Firestation firestation = new Firestation(address, station);
+        
+        when(firestationService.addFirestation(any(Firestation.class))).thenReturn(firestation);
 
-	// Mettre à jour le numéro de la caserne de pompiers d'une adresse
-	@PutMapping
-	public ResponseEntity<Firestation> updateFirestation(@RequestParam("address") String address,
-			@RequestParam("station") String station) {
-		Firestation firestation = new Firestation(address, station);
-		Firestation updatedFirestation = firestationService.updateFirestation(firestation);
-		if (updatedFirestation != null) {
-			return ResponseEntity.ok(updatedFirestation);
-		} else {
-			return ResponseEntity.notFound().build();
-		}
-	}
+        ResponseEntity<Firestation> response = firestationController.addFirestation(firestation);
 
-	// Supprimer le mapping d'une caserne ou d'une adresse
-	@DeleteMapping
-	public ResponseEntity<Void> deleteFirestation(@RequestParam(value = "address", required = false) String address,
-												  @RequestParam(value = "station", required = false) String station) {
-		if (address == null && station == null) {
-			return ResponseEntity.badRequest().build(); // Require at least one parameter (address or station)
-		}
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(firestation, response.getBody());
+        verify(firestationService, times(1)).addFirestation(any(Firestation.class));
+    }
 
-		boolean success = false;
+    @Test
+    void addFirestation_InvalidInput_ReturnsInternalServerError() {
+        
+        String address = "123 Main Street";
+        String station = "1";
+        Firestation firestation = new Firestation(address, station);
 
-		if (address != null) {
-			success = firestationService.deleteFirestationByAddress(address);
-		} else if (station != null) {
-			success = firestationService.deleteFirestationByStation(station);
-		}
+        when(firestationService.addFirestation(any(Firestation.class))).thenReturn(null);
 
-		if (success) {
-			return ResponseEntity.ok().build();
-		} else {
-			return ResponseEntity.notFound().build();
-		}
-	}
+        
+        ResponseEntity<Firestation> response = firestationController.addFirestation(firestation);
+
+        
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(firestationService, times(1)).addFirestation(any(Firestation.class));
+    }
+
+    @Test
+    void updateFirestation_ExistingFirestation_ReturnsUpdatedFirestation() {
+        
+        String address = "123 Main Street";
+        String station = "1";
+        Firestation firestation = new Firestation(address, station);
+        when(firestationService.updateFirestation(any(Firestation.class))).thenReturn(firestation);
+
+        
+        ResponseEntity<Firestation> response = firestationController.updateFirestation(address, station);
+
+        
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(firestation, response.getBody());
+        verify(firestationService, times(1)).updateFirestation(any(Firestation.class));
+    }
+
+    @Test
+    void updateFirestation_NonExistingFirestation_ReturnsNotFound() {
+        
+        String address = "123 Main Street";
+        String station = "1";
+        when(firestationService.updateFirestation(any(Firestation.class))).thenReturn(null);
+
+        
+        ResponseEntity<Firestation> response = firestationController.updateFirestation(address, station);
+
+       
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(firestationService, times(1)).updateFirestation(any(Firestation.class));
+    }
+
+    @Test
+    void deleteFirestation_ExistingFirestation_ReturnsOk() {
+        
+        String address = "1509 Culver St";
+        String station = "3";
+        when(firestationService.deleteFirestationByStation(station)).thenReturn(true);
+
+        
+        ResponseEntity<Void> response = firestationController.deleteFirestation(address, station);
+
+        
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        verify(firestationService, times(0)).deleteFirestationByStation(station);
+    }
+
+    @Test
+    void deleteFirestation_NonExistingFirestation_ReturnsNotFound() {
+        
+        String address = "123 Main Street";
+        String station = "1";
+        when(firestationService.deleteFirestationByAddress(address)).thenReturn(false);
+
+        
+        ResponseEntity<Void> response = firestationController.deleteFirestation(address, station);
+
+        
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        verify(firestationService, times(1)).deleteFirestationByAddress(address);
+    }
+    
+    @Test
+    void deleteFirestation_NonExistingFirestation_ReturnsNotFoundd() {
+        
+        String address = null;
+        String station = "10";
+        when(firestationService.deleteFirestationByStation(station)).thenReturn(false);
+
+        
+        ResponseEntity<Void> response = firestationController.deleteFirestation(address, station);
+
+        
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        verify(firestationService, times(1)).deleteFirestationByStation(station);
+    }
 }
