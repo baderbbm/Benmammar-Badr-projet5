@@ -10,10 +10,10 @@ public class MedicalRecord {
 	private List<String> medications;
 	private List<String> allergies;
 
+	
 	public MedicalRecord() {
 
 	}
-
 	public MedicalRecord(String firstName, String lastName, LocalDate birthdate, List<String> medications,
 			List<String> allergies) {
 		this.firstName = firstName;
