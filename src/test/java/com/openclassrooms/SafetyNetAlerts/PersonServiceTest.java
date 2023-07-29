@@ -2,14 +2,11 @@ package com.openclassrooms.SafetyNetAlerts;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
 import com.openclassrooms.SafetyNetAlerts.model.Person;
 import com.openclassrooms.SafetyNetAlerts.repository.PersonRepository;
 import com.openclassrooms.SafetyNetAlerts.service.PersonService;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,12 +19,9 @@ class PersonServiceTest {
     void setUp() {
         personRepositoryMock = mock(PersonRepository.class);
         List<Person> persons = new ArrayList<>();
-
         persons.add(new Person("John", "Boyd", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"));
         persons.add(new Person("Jacob", "Boyd", "1509 Culver St", "Culver", "97451", "841-874-6513", "drk@email.com"));
-   
         when(personRepositoryMock.getPeople()).thenReturn(persons);
-
         personService = new PersonService(personRepositoryMock);
     }
 
