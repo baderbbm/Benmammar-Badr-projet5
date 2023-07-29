@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.openclassrooms.SafetyNetAlerts.model.dto.Address;
 import com.openclassrooms.SafetyNetAlerts.model.dto.Child;
 import com.openclassrooms.SafetyNetAlerts.model.dto.FirestationCoverage;
 import com.openclassrooms.SafetyNetAlerts.model.dto.Resident;
@@ -65,7 +66,7 @@ public class SafetyController {
     // et faire figurer leurs antécédents médicaux (médicaments, posologie et allergies) à côté de chaque nom. 
     
     @GetMapping("/flood/stations")
-    public List<ResidentStation> getHouseholdsByStations(@RequestParam("stations") String stationNumbers) {
+    public List<Address> getHouseholdsByStations(@RequestParam("stations") String stationNumbers) {
         return safetyService.getAllResidentsByFirestations(Arrays.asList(stationNumbers.split(",")));
     }
     
@@ -86,4 +87,3 @@ public class SafetyController {
     }
    
 }
-
