@@ -16,18 +16,16 @@ public class FirestationController {
 		this.firestationService = firestationService;
 	}
 
-	// Ajouter un mapping caserne/adresse
-	@PostMapping
-	public ResponseEntity<Firestation> addFirestation(@RequestParam("address") String address,
-			@RequestParam("station") String station) {
-		Firestation firestation = new Firestation(address, station);
-		Firestation addedFirestation = firestationService.addFirestation(firestation);
-		if (addedFirestation != null) {
-			return ResponseEntity.ok(addedFirestation);
-		} else {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
-	}
+    // Ajouter un mapping caserne/adresse
+    @PostMapping
+    public ResponseEntity<Firestation> addFirestation(@RequestBody Firestation firestation) {
+        Firestation addedFirestation = firestationService.addFirestation(firestation);
+        if (addedFirestation != null) {
+            return ResponseEntity.ok(addedFirestation);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 	// Mettre à jour le numéro de la caserne de pompiers d'une adresse
 	@PutMapping
@@ -47,7 +45,7 @@ public class FirestationController {
 	public ResponseEntity<Void> deleteFirestation(@RequestParam(value = "address", required = false) String address,
 			@RequestParam(value = "station", required = false) String station) {
 		if (address == null && station == null) {
-			return ResponseEntity.badRequest().build(); // Require at least one parameter (address or station)
+			return ResponseEntity.badRequest().build(); 
 		}
 
 		boolean success = false;
