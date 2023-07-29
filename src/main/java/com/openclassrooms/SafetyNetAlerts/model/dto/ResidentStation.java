@@ -19,6 +19,16 @@ public class ResidentStation {
 		this.lastName = lastName;
 		this.phone = phone;
 	}
+	
+	public ResidentStation(String firstName, String lastName, String phone, int age, List<String> medications,
+			List<String> allergies) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.phone = phone;
+		this.age = age;
+		this.medications = medications;
+		this.allergies = allergies;
+	}
 
 	public String getFirstName() {
 		return firstName;
