@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -31,9 +30,7 @@ class PersonControllerTest {
     void addPerson_shouldReturnAddedPerson() {
         Person newPerson = new Person("John", "Doe", "123 Main St", "City", "12345", "555-555-5555", "john@example.com");
         when(personServiceMock.addPerson(newPerson)).thenReturn(newPerson);
-
         ResponseEntity<Person> response = personController.addPerson(newPerson);
-
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(newPerson, response.getBody());
@@ -43,9 +40,7 @@ class PersonControllerTest {
     void addPerson_shouldReturnInternalServerError() {
         Person newPerson = new Person("John", "Doe", "123 Main St", "City", "12345", "555-555-5555", "john@example.com");
         when(personServiceMock.addPerson(newPerson)).thenReturn(null);
-
         ResponseEntity<Person> response = personController.addPerson(newPerson);
-
         assertNotNull(response);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNull(response.getBody());
@@ -57,9 +52,7 @@ class PersonControllerTest {
         String lastName = "Doe";
         Person updatedPerson = new Person("Updated", "Person", "New Address", "New City", "12345", "555-555-5555", "updated@example.com");
         when(personServiceMock.updatePerson(firstName, lastName, updatedPerson)).thenReturn(updatedPerson);
-
         ResponseEntity<Person> response = personController.updatePerson(firstName, lastName, updatedPerson);
-
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(updatedPerson, response.getBody());
@@ -71,9 +64,7 @@ class PersonControllerTest {
         String lastName = "Person";
         Person updatedPerson = new Person("Updated", "Person", "New Address", "New City", "12345", "555-555-5555", "updated@example.com");
         when(personServiceMock.updatePerson(firstName, lastName, updatedPerson)).thenReturn(null);
-
         ResponseEntity<Person> response = personController.updatePerson(firstName, lastName, updatedPerson);
-
         assertNotNull(response);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNull(response.getBody());
@@ -84,9 +75,7 @@ class PersonControllerTest {
         String firstName = "John";
         String lastName = "Doe";
         when(personServiceMock.deletePerson(firstName, lastName)).thenReturn(true);
-
         ResponseEntity<Void> response = personController.deletePerson(firstName, lastName);
-
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNull(response.getBody());
@@ -97,9 +86,7 @@ class PersonControllerTest {
         String firstName = "NonExistent";
         String lastName = "Person";
         when(personServiceMock.deletePerson(firstName, lastName)).thenReturn(false);
-
         ResponseEntity<Void> response = personController.deletePerson(firstName, lastName);
-
         assertNotNull(response);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNull(response.getBody());
