@@ -80,8 +80,7 @@ public class SafetyService {
 
 
 	// retourner le nom, l'adresse, l'âge, l'adresse mail
-	// et les antécédents médicaux (médicaments, posologie, allergies) de chaque
-	// habitant
+	// et les antécédents médicaux (médicaments, posologie, allergies) de chaque habitant
 
 	public List<ResidentInfo> retrievePersonInfoByName(String firstName, String lastName) {
 		if ((firstName == null || firstName.isEmpty()) && lastName.isEmpty()) {
@@ -117,8 +116,7 @@ public class SafetyService {
 		return addresses;
 	}
 
-	// Récupérer des informations sur les personnes associées à une liste d'adresses
-	// données
+	// Récupérer des informations sur les personnes associées à une liste d'adresses données
 
 	public FirestationCoverage getPeopleByAddresses(List<String> addresses) {
 
@@ -269,7 +267,6 @@ public class SafetyService {
 				String personFirstName = person.getFirstName();
 				String personLastName = person.getLastName();
 				String personPhone = person.getPhone();
-				// String personEmail =person.getEmail();
 				int personAge = getAgeFromMedicalRecords(person, medicalRecords);
 
 				// Trouver la caserne de pompiers desservant cette adresse
@@ -287,7 +284,6 @@ public class SafetyService {
 				resident.setLastName(personLastName);
 				resident.setPhone(personPhone);
 				resident.setAge(personAge);
-				// resident.setEmail(personEmail);
 				resident.setStation(firestationNumber);
 
 				// Ajouter les antécédents médicaux à partir du dossier médical correspondant
@@ -307,6 +303,10 @@ public class SafetyService {
 		return residents;
 	}
 
+	
+	// calculer l'âge d'une personne en fonction de ses informations médicales
+	// (date de naissance) contenues dans la liste de dossiers médicaux 
+	
 	private int getAgeFromMedicalRecords(Person person, List<MedicalRecord> medicalRecords) {
 		for (MedicalRecord medicalRecord : medicalRecords) {
 			if (medicalRecord.getFirstName().equals(person.getFirstName())
@@ -386,10 +386,8 @@ public class SafetyService {
 	
 
 	// prend un prénom et un nom de famille en entrée, récupère les informations des
-	// résidents correspondants
-	// à partir de différentes sources de données, les combine dans des objets
-	// ResidentInfo, puis renvoie
-	// une liste contenant ces informations pour tous les résidents correspondants
+	// résidents correspondants à partir de différentes sources de données, les combine dans des objets
+	// ResidentInfo, puis renvoie une liste contenant ces informations pour tous les résidents correspondants
 
 	public List<ResidentInfo> getPersonInfo(String firstName, String lastName) {
 		List<ResidentInfo> residents = new ArrayList<>();
@@ -398,8 +396,7 @@ public class SafetyService {
 
 		List<Person> people = getPeopleByFirstNameAndLastName(personRepository.getPeople(), firstName, lastName);
 
-		// Récupérer les informations complémentaires nécessaires (firestations,
-		// medicalrecords, etc.)
+		// Récupérer les informations complémentaires nécessaires (firestations, medicalrecords, etc.)
 		List<Firestation> firestations = firestationRepository.getFirestations();
 		List<MedicalRecord> medicalRecords = medicalRecordRepository.getMedicalRecord();
 
@@ -438,10 +435,8 @@ public class SafetyService {
 	}
 
 	// prend une liste de personnes, un prénom et un nom de famille en entrée,
-	// filtre la liste pour ne conserver que
-	// les personnes ayant le prénom et le nom de famille spécifiés, puis retourne
-	// une nouvelle liste contenant
-	// ces personnes filtrées
+	// filtre la liste pour ne conserver que les personnes ayant le prénom et le nom de famille spécifiés, puis retourne
+	// une nouvelle liste contenant ces personnes filtrées
 
 	public List<Person> getPeopleByFirstNameAndLastName(List<Person> people, String firstName, String lastName) {
 		List<Person> matchingPeople = new ArrayList<>();
@@ -455,6 +450,9 @@ public class SafetyService {
 		return matchingPeople;
 	}
 
+	// Prend en paramètre le nom de famille (lastName) et renvoie une liste d'objets ResidentInfo. 
+	// Elle est utilisée pour récupérer les informations sur les résidents (personnes) en fonction de leur nom de famille.
+	
 	public List<ResidentInfo> getPersonInfo(String lastName) {
 
 		List<ResidentInfo> residents = new ArrayList<>();
@@ -504,8 +502,7 @@ public class SafetyService {
 	}
 
 	// prend une liste de personnes et un nom de famille en entrée, filtre la liste
-	// pour ne conserver
-	// que les personnes ayant le nom de famille spécifié, puis retourne une
+	// pour ne conserver que les personnes ayant le nom de famille spécifié, puis retourne une
 	// nouvelle liste contenant ces personnes filtrées
 
 	public List<Person> getPeopleByLastName(List<Person> people, String lastName) {
@@ -520,8 +517,7 @@ public class SafetyService {
 	}
 
 	// récupère une liste de personnes, filtre celles qui résident
-	// dans la ville spécifiée et renvoie une liste d'adresses e-mail
-	// correspondantes
+	// dans la ville spécifiée et renvoie une liste d'adresses e-mail correspondantes
 
 	public List<String> getCommunityEmailsByCity(String city) {
 		List<Person> people = personRepository.getPeople();
