@@ -12,6 +12,10 @@ public class ResidentInfo {
 	private List<String> medications;
 	private List<String> allergies;
 
+	public ResidentInfo() {
+		
+	}
+	
 	public ResidentInfo(String firstName, String lastName, String adress, String email, int age,
 			List<String> medications, List<String> allergies) {
 		this.firstName = firstName;
@@ -21,10 +25,6 @@ public class ResidentInfo {
 		this.age = age;
 		this.medications = medications;
 		this.allergies = allergies;
-	}
-
-	public ResidentInfo() {
-
 	}
 
 	public List<String> getMedications() {
