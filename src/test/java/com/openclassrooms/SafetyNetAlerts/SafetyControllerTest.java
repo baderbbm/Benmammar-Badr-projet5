@@ -34,8 +34,7 @@ public class SafetyControllerTest {
 		String stationNumber = "4";
 		FirestationCoverage expectedResponse = new FirestationCoverage();
 
-		expectedResponse
-				.setPeople(Arrays.asList(new PersonCaserne("Lily", "Cooper", "489 Manchester St", "841-874-9845"),
+		expectedResponse.setPeople(Arrays.asList(new PersonCaserne("Lily", "Cooper", "489 Manchester St", "841-874-9845"),
 						new PersonCaserne("Tony", "Cooper", "112 Steppes Pl", "841-874-6874"),
 						new PersonCaserne("Ron", "Peters", "112 Steppes Pl", "841-874-8888"),
 						new PersonCaserne("Allison", "Boyd", "112 Steppes Pl", "841-874-9888")));
@@ -54,8 +53,7 @@ public class SafetyControllerTest {
 
 		String address = "947 E. Rose Dr";
 
-		List<Child> expectedChildren = Arrays
-				.asList(new Child("Kendrik", "Stelzer", 9, Arrays.asList("Brian Stelzer", "Shawna Stelzer")));
+		List<Child> expectedChildren = Arrays.asList(new Child("Kendrik", "Stelzer", 9, Arrays.asList("Brian Stelzer", "Shawna Stelzer")));
 
 		when(safetyService.retrieveChildrenByAddress(address)).thenReturn(expectedChildren);
 
@@ -120,48 +118,51 @@ public class SafetyControllerTest {
 	}
 
 	@Test
-    public void testGetHouseholdsByStations() throws Exception {
-        String stationNumber1 = "4";
-        List<String> medications1 = new ArrayList<>();
-   		medications1.add("");
-   		
-   		List<String> allergies1 = new ArrayList<>();
-   		allergies1.add("");
-          List<String> medications2 = new ArrayList<>();
-       		medications2.add("hydrapermazol:300mg");
-       		medications2.add("dodoxadin:30mg");
+	public void testGetHouseholdsByStations() throws Exception {
+		String stationNumber1 = "4";
+		List<String> medications1 = new ArrayList<>();
+		medications1.add("");
 
-       		List<String> allergies2 = new ArrayList<>();
-       		allergies2.add("shellfish");
-       		
-       	    List<String> medications3 = new ArrayList<>();
-       		medications3.add("aznol:200mg");
+		List<String> allergies1 = new ArrayList<>();
+		allergies1.add("");
+		List<String> medications2 = new ArrayList<>();
+		medications2.add("hydrapermazol:300mg");
+		medications2.add("dodoxadin:30mg");
 
-       		List<String> allergies3 = new ArrayList<>();
-       		allergies3.add("nillacilan");
-       		                                                         
-        List<Address> expectedHouseholds1 = new ArrayList<>();
-        expectedHouseholds1.add(new Address("489 Manchester St", Arrays.asList(new ResidentStation("Lily", "Cooper", "841-874-9845", 29, medications1, allergies1))));
-        expectedHouseholds1.add(new Address("112 Steppes Pl", Arrays.asList(new ResidentStation("Tony","Cooper","841-874-6874",29, medications2, allergies2))));
-        expectedHouseholds1.add(new Address("112 Steppes Pl", Arrays.asList(new ResidentStation("Ron","Peters","841-874-8888",58, medications1, allergies1))));
-        expectedHouseholds1.add(new Address("112 Steppes Pl", Arrays.asList(new ResidentStation("Allison","Boyd","841-874-9888", 58, medications3, allergies3))));
-        List<String> stationNumbers = new ArrayList<>();
-        stationNumbers.add(stationNumber1);
-        when(safetyService.getAllResidentsByFirestations(stationNumbers)).thenReturn(expectedHouseholds1);
-        
-        mockMvc.perform(get("/flood/stations").param("stations", stationNumber1))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].address").value("489 Manchester St"))
-                .andExpect(jsonPath("$[0].residentStation[0].firstName").value("Lily"))
-                .andExpect(jsonPath("$[1].address").value("112 Steppes Pl"))
-                .andExpect(jsonPath("$[1].residentStation[0].firstName").value("Tony"))
-                .andExpect(jsonPath("$[2].address").value("112 Steppes Pl"))
-                .andExpect(jsonPath("$[2].residentStation[0].firstName").value("Ron"))
-                .andExpect(jsonPath("$[3].address").value("112 Steppes Pl"))
-                .andExpect(jsonPath("$[3].residentStation[0].firstName").value("Allison"));
+		List<String> allergies2 = new ArrayList<>();
+		allergies2.add("shellfish");
 
-        verify(safetyService, times(1)).getAllResidentsByFirestations(stationNumbers);
-    }
+		List<String> medications3 = new ArrayList<>();
+		medications3.add("aznol:200mg");
+
+		List<String> allergies3 = new ArrayList<>();
+		allergies3.add("nillacilan");
+
+		List<Address> expectedHouseholds1 = new ArrayList<>();
+		expectedHouseholds1.add(new Address("489 Manchester St",
+				Arrays.asList(new ResidentStation("Lily", "Cooper", "841-874-9845", 29, medications1, allergies1))));
+		expectedHouseholds1.add(new Address("112 Steppes Pl",
+				Arrays.asList(new ResidentStation("Tony", "Cooper", "841-874-6874", 29, medications2, allergies2))));
+		expectedHouseholds1.add(new Address("112 Steppes Pl",
+				Arrays.asList(new ResidentStation("Ron", "Peters", "841-874-8888", 58, medications1, allergies1))));
+		expectedHouseholds1.add(new Address("112 Steppes Pl",
+				Arrays.asList(new ResidentStation("Allison", "Boyd", "841-874-9888", 58, medications3, allergies3))));
+		List<String> stationNumbers = new ArrayList<>();
+		stationNumbers.add(stationNumber1);
+		when(safetyService.getAllResidentsByFirestations(stationNumbers)).thenReturn(expectedHouseholds1);
+
+		mockMvc.perform(get("/flood/stations").param("stations", stationNumber1)).andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].address").value("489 Manchester St"))
+				.andExpect(jsonPath("$[0].residentStation[0].firstName").value("Lily"))
+				.andExpect(jsonPath("$[1].address").value("112 Steppes Pl"))
+				.andExpect(jsonPath("$[1].residentStation[0].firstName").value("Tony"))
+				.andExpect(jsonPath("$[2].address").value("112 Steppes Pl"))
+				.andExpect(jsonPath("$[2].residentStation[0].firstName").value("Ron"))
+				.andExpect(jsonPath("$[3].address").value("112 Steppes Pl"))
+				.andExpect(jsonPath("$[3].residentStation[0].firstName").value("Allison"));
+
+		verify(safetyService, times(1)).getAllResidentsByFirestations(stationNumbers);
+	}
 
 	@Test
 	public void testGetPersonInfoByName() throws Exception {
