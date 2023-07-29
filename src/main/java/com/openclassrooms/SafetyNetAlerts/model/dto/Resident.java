@@ -22,12 +22,6 @@ public class Resident {
 		this.allergies = allergies;
 	}
 
-	public Resident(String firstName, String lastName, String phone) {
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.phone = phone;
-	}
-
 	public String getStation() {
 		return station;
 	}
