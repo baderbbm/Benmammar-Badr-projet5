@@ -118,50 +118,85 @@ public class SafetyControllerTest {
 	}
 
 	@Test
-	public void testGetHouseholdsByStations() throws Exception {
-		String stationNumber1 = "4";
-		List<String> medications1 = new ArrayList<>();
-		medications1.add("");
+    public void testGetHouseholdsByStations() throws Exception {
 
-		List<String> allergies1 = new ArrayList<>();
-		allergies1.add("");
-		List<String> medications2 = new ArrayList<>();
-		medications2.add("hydrapermazol:300mg");
-		medications2.add("dodoxadin:30mg");
+        String stationNumber1 = "4";
+        List<String> medications1 = new ArrayList<>();
+        medications1.add("");
 
-		List<String> allergies2 = new ArrayList<>();
-		allergies2.add("shellfish");
+        List<String> allergies1 = new ArrayList<>();
+        allergies1.add("");
+        List<String> medications2 = new ArrayList<>();
+        medications2.add("hydrapermazol:300mg");
+        medications2.add("dodoxadin:30mg");
 
-		List<String> medications3 = new ArrayList<>();
-		medications3.add("aznol:200mg");
+        List<String> allergies2 = new ArrayList<>();
+        allergies2.add("shellfish");
 
-		List<String> allergies3 = new ArrayList<>();
-		allergies3.add("nillacilan");
+        List<String> medications3 = new ArrayList<>();
+        medications3.add("aznol:200mg");
 
-		List<Address> expectedHouseholds1 = new ArrayList<>();
-		expectedHouseholds1.add(new Address("489 Manchester St",
-				Arrays.asList(new ResidentStation("Lily", "Cooper", "841-874-9845", 29, medications1, allergies1))));
-		expectedHouseholds1.add(new Address("112 Steppes Pl",
-				Arrays.asList(new ResidentStation("Tony", "Cooper", "841-874-6874", 29, medications2, allergies2))));
-		expectedHouseholds1.add(new Address("112 Steppes Pl",
-				Arrays.asList(new ResidentStation("Ron", "Peters", "841-874-8888", 58, medications1, allergies1))));
-		expectedHouseholds1.add(new Address("112 Steppes Pl",
-				Arrays.asList(new ResidentStation("Allison", "Boyd", "841-874-9888", 58, medications3, allergies3))));
-		List<String> stationNumbers = new ArrayList<>();
-		stationNumbers.add(stationNumber1);
-		when(safetyService.getAllResidentsByFirestations(stationNumbers)).thenReturn(expectedHouseholds1);
+        List<String> allergies3 = new ArrayList<>();
+        allergies3.add("nillacilan");
 
-		mockMvc.perform(get("/flood/stations").param("stations", stationNumber1)).andExpect(status().isOk())
-				.andExpect(jsonPath("$[0].address").value("489 Manchester St"))
-				.andExpect(jsonPath("$[0].residentStation[0].firstName").value("Lily"))
-				.andExpect(jsonPath("$[1].address").value("112 Steppes Pl"))
-				.andExpect(jsonPath("$[1].residentStation[0].firstName").value("Tony"))
-				.andExpect(jsonPath("$[2].address").value("112 Steppes Pl"))
-				.andExpect(jsonPath("$[2].residentStation[0].firstName").value("Ron"))
-				.andExpect(jsonPath("$[3].address").value("112 Steppes Pl"))
-				.andExpect(jsonPath("$[3].residentStation[0].firstName").value("Allison"));
+        List<Address> expectedHouseholds1 = new ArrayList<>();
+        expectedHouseholds1.add(new Address("489 Manchester St",
+                Arrays.asList(new ResidentStation("Lily", "Cooper", "841-874-9845", 29, medications1, allergies1))));
+        expectedHouseholds1.add(new Address("112 Steppes Pl",
+                Arrays.asList(new ResidentStation("Tony", "Cooper", "841-874-6874", 29, medications2, allergies2))));
+        expectedHouseholds1.add(new Address("112 Steppes Pl",
+                Arrays.asList(new ResidentStation("Ron", "Peters", "841-874-8888", 58, medications1, allergies1))));
+        expectedHouseholds1.add(new Address("112 Steppes Pl",
+                Arrays.asList(new ResidentStation("Allison", "Boyd", "841-874-9888", 58, medications3, allergies3))));
 
-		verify(safetyService, times(1)).getAllResidentsByFirestations(stationNumbers);
+        List<String> stationNumbers = new ArrayList<>();
+        stationNumbers.add(stationNumber1);
+        when(safetyService.getAllResidentsByFirestations(stationNumbers)).thenReturn(expectedHouseholds1);
+
+        mockMvc.perform(get("/flood/stations").param("stations", stationNumber1)).andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].address").value("489 Manchester St"))
+                .andExpect(jsonPath("$[0].residentStation[0].firstName").value("Lily"))
+                .andExpect(jsonPath("$[1].address").value("112 Steppes Pl"))
+                .andExpect(jsonPath("$[1].residentStation[0].firstName").value("Tony"))
+                .andExpect(jsonPath("$[2].address").value("112 Steppes Pl"))
+                .andExpect(jsonPath("$[2].residentStation[0].firstName").value("Ron"))
+                .andExpect(jsonPath("$[3].address").value("112 Steppes Pl"))
+                .andExpect(jsonPath("$[3].residentStation[0].firstName").value("Allison"));
+
+        String stationNumber2 = "2";
+        List<String> medications4 = new ArrayList<>();
+        medications4.add("aznol:60mg");
+        medications4.add("hydrapermazol:900mg");
+        medications4.add("pharmacol:5000mg");
+        medications4.add("terazine:500mg");
+
+        List<String> allergies4 = new ArrayList<>();
+        allergies4.add("peanut");
+        allergies4.add("shellfish");
+        allergies4.add("aznol");
+
+        List<Address> expectedHouseholds2 = new ArrayList<>();
+        expectedHouseholds2.add(new Address("892 Downing Ct",
+                Arrays.asList(new ResidentStation("Sophia", "Zemicks", "841-874-7878", 35, medications4, allergies4))));
+        expectedHouseholds2.add(new Address("892 Downing Ct",
+                Arrays.asList(new ResidentStation("Warren", "Zemicks", "841-874-7512", 38, medications1, allergies1))));
+        expectedHouseholds2.add(new Address("892 Downing Ct",
+                Arrays.asList(new ResidentStation("Zach", "Zemicks", "841-874-7512", 6, medications1, allergies1))));
+
+        stationNumbers.add(stationNumber2);
+        when(safetyService.getAllResidentsByFirestations(stationNumbers)).thenReturn(expectedHouseholds2);
+
+        mockMvc.perform(get("/flood/stations").param("stations", stationNumber1 + "," + stationNumber2))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].address").value("892 Downing Ct"))
+                .andExpect(jsonPath("$[0].residentStation[0].firstName").value("Sophia"))
+                .andExpect(jsonPath("$[1].address").value("892 Downing Ct"))
+                .andExpect(jsonPath("$[1].residentStation[0].firstName").value("Warren"))
+                .andExpect(jsonPath("$[2].address").value("892 Downing Ct"))
+                .andExpect(jsonPath("$[2].residentStation[0].firstName").value("Zach"));
+
+
+        verify(safetyService, times(1)).getAllResidentsByFirestations(stationNumbers);
 	}
 
 	@Test
