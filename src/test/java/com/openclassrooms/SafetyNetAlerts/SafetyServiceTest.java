@@ -21,6 +21,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class SafetyServiceTest {
 
@@ -410,4 +413,49 @@ public class SafetyServiceTest {
 		List<String> actual = safetyService.getHouseholdMembers(person, address);
 		assertEquals(expected, actual);
 	}
+	
+	@Test
+    public void testGetAllResidentsByFirestations() {
+        // Test data
+        String stationNumber1 = "4";
+        String stationNumber2 = "2";
+
+        // Create mock data for the inner method getAllResidentsByFirestation()
+        List<Address> residentsForStation1 = new ArrayList<>();
+        residentsForStation1.add(new Address("489 Manchester St",
+                Arrays.asList(new ResidentStation("Lily", "Cooper", "841-874-9845", 29, new ArrayList<>(), new ArrayList<>()))));
+        residentsForStation1.add(new Address("112 Steppes Pl",
+                Arrays.asList(new ResidentStation("Tony", "Cooper", "841-874-6874", 29, new ArrayList<>(), new ArrayList<>()))));
+
+        List<Address> residentsForStation2 = new ArrayList<>();
+        residentsForStation2.add(new Address("29 15th St",
+                Arrays.asList(new ResidentStation("Jonanathan", "Marrack", "841-874-6513", 34, new ArrayList<>(), new ArrayList<>()))));
+        residentsForStation2.add(new Address("892 Downing Ct",
+                Arrays.asList(new ResidentStation("Sophia", "Zemicks", "841-874-7878", 35, new ArrayList<>(), new ArrayList<>()))));
+
+        List<String> stationNumbers = Arrays.asList(stationNumber1, stationNumber2);
+        List<Address> allResidents1 = safetyService.getAllResidentsByFirestation(stationNumber1);
+        List<Address> allResidents2 = safetyService.getAllResidentsByFirestation(stationNumber2);
+        List<Address> allResidents = safetyService.getAllResidentsByFirestations(stationNumbers);
+        assertEquals(allResidents.get(0).getResidentStation().get(0).getFirstName(), 
+        		allResidents1.get(0).getResidentStation().get(0).getFirstName());
+        assertEquals(allResidents.get(2).getResidentStation().get(0).getFirstName(), 
+        		allResidents2.get(0).getResidentStation().get(0).getFirstName());
+     
+    }
+	 @Test
+	    public void testGetPhoneNumbersByStationNumber() {
+	        String stationNumber = "4";
+	        List<String> actualPhoneNumbers = safetyService.getPhoneNumbersByStationNumber(stationNumber);
+	        List<String> expectedPhoneNumbers = Arrays.asList("841-874-9845","841-874-6874","841-874-8888","841-874-9888");
+	        assertEquals(expectedPhoneNumbers, actualPhoneNumbers);
+	    }
+
+	    @Test
+	    public void testRetrievePhoneNumbersByFirestation_StationNumberEmpty() {
+	        String stationNumber = "";
+	        List<String> actualPhoneNumbers = safetyService.retrievePhoneNumbersByFirestation(stationNumber);
+	        List<String> expectedPhoneNumbers = new ArrayList<>();
+	        assertEquals(expectedPhoneNumbers, actualPhoneNumbers);
+	    }
 }
