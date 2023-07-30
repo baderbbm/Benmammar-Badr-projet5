@@ -1,6 +1,5 @@
 package com.openclassrooms.SafetyNetAlerts.model;
 
-
 public class Person {
     private String firstName;
     private String lastName;
@@ -78,4 +77,10 @@ public class Person {
     public void setEmail(String email) {
         this.email = email;
     }
+
+	@Override
+	public String toString() {
+		return "firstName=" + firstName + ", lastName=" + lastName + ", address=" + address + ", city=" + city
+				+ ", zip=" + zip + ", phone=" + phone + ", email=" + email;
+	}
 }
