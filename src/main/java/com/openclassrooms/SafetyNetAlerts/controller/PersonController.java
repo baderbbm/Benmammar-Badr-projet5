@@ -21,7 +21,7 @@ public class PersonController {
     // Ajouter une nouvelle personne
     @PostMapping
     public ResponseEntity<Person> addPerson(@RequestBody Person person) {
-        logger.info("Adding a new person: {}", person);
+        logger.info("/person - POST - Adding a new person: {}", person);
 
         Person addedPerson = personService.addPerson(person);
         if (addedPerson != null) {
@@ -38,7 +38,7 @@ public class PersonController {
     public ResponseEntity<Person> updatePerson(@PathVariable String firstName,
                                                @PathVariable String lastName,
                                                @RequestBody Person person) {
-        logger.info("Updating person - First Name: {}, Last Name: {}, Person: {}", firstName, lastName, person);
+        logger.info("/person - PUT - Updating person - First Name: {}, Last Name: {}, Person: {}", firstName, lastName, person);
 
         Person updatedPerson = personService.updatePerson(firstName, lastName, person);
         if (updatedPerson != null) {
@@ -54,7 +54,7 @@ public class PersonController {
     @DeleteMapping("/{firstName}/{lastName}")
     public ResponseEntity<Void> deletePerson(@PathVariable String firstName,
                                              @PathVariable String lastName) {
-        logger.info("Deleting person - First Name: {}, Last Name: {}", firstName, lastName);
+        logger.info("/person - DELETE -  Deleting person - First Name: {}, Last Name: {}", firstName, lastName);
 
         boolean success = personService.deletePerson(firstName, lastName);
         if (success) {
