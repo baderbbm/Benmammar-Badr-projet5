@@ -7,13 +7,14 @@ public class MedicalRecord {
 	private String firstName;
 	private String lastName;
 	private LocalDate birthdate;
+
 	private List<String> medications;
 	private List<String> allergies;
 
-	
 	public MedicalRecord() {
 
 	}
+
 	public MedicalRecord(String firstName, String lastName, LocalDate birthdate, List<String> medications,
 			List<String> allergies) {
 		this.firstName = firstName;
@@ -61,5 +62,11 @@ public class MedicalRecord {
 
 	public void setAllergies(List<String> allergies) {
 		this.allergies = allergies;
+	}
+	
+	@Override
+	public String toString() {
+		return "firstName=" + firstName + ", lastName=" + lastName + ", birthdate=" + birthdate
+				+ ", medications=" + medications + ", allergies=" + allergies;
 	}
 }
