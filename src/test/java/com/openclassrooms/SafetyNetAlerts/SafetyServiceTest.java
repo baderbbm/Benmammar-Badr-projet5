@@ -43,7 +43,6 @@ public class SafetyServiceTest {
 	@Test
 	public void testRetrievePersonsByFirestation() {
 		String stationNumber = "4";
-		List<String> expectedAddresses = Arrays.asList("489 Manchester St", "112 Steppes Pl");
 		FirestationCoverage expectedResponse = new FirestationCoverage();
 		List<PersonCaserne> expectedResidents = Arrays.asList(
 				new PersonCaserne("Lily", "Cooper", "489 Manchester St", "841-874-9845"),
