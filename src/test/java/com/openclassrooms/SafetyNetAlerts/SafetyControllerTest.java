@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -31,23 +33,29 @@ public class SafetyControllerTest {
 
 	@Test
 	public void testGetPersonsByFirestation() throws Exception {
-		String stationNumber = "4";
-		FirestationCoverage expectedResponse = new FirestationCoverage();
+	    String stationNumber = "4";
+	    FirestationCoverage expectedResponse = new FirestationCoverage();
 
-		expectedResponse.setPeople(Arrays.asList(new PersonCaserne("Lily", "Cooper", "489 Manchester St", "841-874-9845"),
-						new PersonCaserne("Tony", "Cooper", "112 Steppes Pl", "841-874-6874"),
-						new PersonCaserne("Ron", "Peters", "112 Steppes Pl", "841-874-8888"),
-						new PersonCaserne("Allison", "Boyd", "112 Steppes Pl", "841-874-9888")));
+	    expectedResponse.setPeople(Arrays.asList(
+	            new PersonCaserne("Lily", "Cooper", "489 Manchester St", "841-874-9845"),
+	            new PersonCaserne("Tony", "Cooper", "112 Steppes Pl", "841-874-6874"),
+	            new PersonCaserne("Ron", "Peters", "112 Steppes Pl", "841-874-8888"),
+	            new PersonCaserne("Allison", "Boyd", "112 Steppes Pl", "841-874-9888")));
 
-		when(safetyService.retrievePersonsByFirestation(stationNumber)).thenReturn(expectedResponse);
+	    when(safetyService.retrievePersonsByFirestation(stationNumber)).thenReturn(expectedResponse);
 
-		mockMvc.perform(get("/firestation").param("stationNumber", stationNumber)).andExpect(status().isOk())
-				.andExpect(jsonPath("$.adultsCount").value(expectedResponse.getAdultsCount()))
-				.andExpect(jsonPath("$.childrenCount").value(expectedResponse.getChildrenCount()));
+	    mockMvc.perform(get("/firestation").param("stationNumber", stationNumber))
+	            .andExpect(status().isOk())
+	            .andExpect(jsonPath("$.adultsCount").value(expectedResponse.getAdultsCount()))
+	            .andExpect(jsonPath("$.childrenCount").value(expectedResponse.getChildrenCount()))
+	            .andExpect(jsonPath("$.people[*].firstName", hasItem("Lily")))
+	            .andExpect(jsonPath("$.people[*].firstName", hasItem("Tony")))
+	            .andExpect(jsonPath("$.people[*].firstName", hasItem("Ron")))
+	            .andExpect(jsonPath("$.people[*].firstName", hasItem("Allison")));
 
-		verify(safetyService, times(1)).retrievePersonsByFirestation(stationNumber);
+	    verify(safetyService, times(1)).retrievePersonsByFirestation(stationNumber);
 	}
-
+	
 	@Test
 	public void testGetChildrenByAddress() throws Exception {
 
